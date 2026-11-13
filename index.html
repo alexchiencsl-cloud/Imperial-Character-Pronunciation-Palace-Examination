@@ -200,6 +200,11 @@
             border: 2px solid var(--gold-500);
             box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
         }
+        #game-screen {
+            background:
+                linear-gradient(180deg, rgba(255, 249, 233, 0.38) 0%, rgba(255, 249, 233, 0.28) 60%, rgba(243, 230, 191, 0.46) 100%),
+                url('assets/palace_study_bg.jpg') center/cover no-repeat;
+        }
         #game-over-screen {
             background:
                 linear-gradient(180deg, rgba(40, 5, 7, 0.22) 0%, rgba(40, 5, 7, 0.34) 60%, rgba(24, 3, 4, 0.72) 100%),
@@ -207,9 +212,8 @@
         }
         #game-over-screen.emperor-pass-mode {
             background:
-                radial-gradient(circle at 50% 18%, rgba(254, 240, 138, 0.42) 0%, transparent 55%),
-                linear-gradient(180deg, rgba(133, 77, 14, 0.52) 0%, rgba(74, 12, 16, 0.55) 55%, rgba(28, 3, 4, 0.78) 100%),
-                url('assets/palace_result_bg.jpg') center/cover no-repeat;
+                linear-gradient(180deg, rgba(40, 5, 7, 0.16) 0%, rgba(40, 5, 7, 0.28) 60%, rgba(24, 3, 4, 0.65) 100%),
+                url('assets/emperor_throne_win_bg.jpg') center/cover no-repeat;
         }
         #scroll-inner {
             background:
@@ -479,14 +483,14 @@
 
             <!-- 開考前考官宣旨說明彈窗 -->
             <div id="intro-overlay" class="hidden absolute inset-0 z-40 bg-black/75 flex items-center justify-center p-4">
-                <div class="palace-paper border-4 border-[#d4af37] rounded-2xl p-4 max-w-xs w-full text-stone-900 shadow-2xl text-center relative">
-                    <div class="text-xs tracking-[0.3em] text-[#991b1b] font-bold mb-1">奉旨開考・試場須知</div>
-                    <div id="intro-stage-title" class="text-xl font-black text-[#7c1919] mb-2">第一關・字音初試</div>
-                    <div id="intro-avatar" class="w-24 h-24 mx-auto rounded-full border-3 border-[#991b1b] shadow-lg overflow-hidden mb-2 bg-amber-50"></div>
-                    <div id="intro-examiner" class="text-sm font-black text-[#7c1919] mb-1.5">主考官：縣令老夫子</div>
-                    <div id="intro-desc" class="text-xs text-stone-800 bg-white/80 border border-[#d4af37] rounded-xl p-2.5 leading-relaxed mb-2.5 text-left"></div>
-                    <div id="intro-rule" class="text-xs font-bold text-red-900 bg-amber-100 border border-amber-400 rounded-lg py-1.5 px-2 mb-3"></div>
-                    <button onclick="beginActualQuiz()" class="btn-press w-full bg-gradient-to-r from-[#7c1919] to-[#991b1b] text-[#f6dc82] font-black py-2.5 rounded-xl text-base border-2 border-[#d4af37] shadow-lg">
+                <div class="bang-card border-4 border-[#D6A936] rounded-2xl p-4 max-w-xs w-full text-[#1D1614] shadow-2xl text-center relative" style="background:linear-gradient(180deg,rgba(255,249,233,0.82),rgba(243,230,191,0.88)),url('assets/scroll_parchment_ink.jpg') center/cover no-repeat">
+                    <div class="text-xs tracking-[0.3em] text-[#74151B] font-bold mb-1">奉旨開考・試場須知</div>
+                    <div id="intro-stage-title" class="text-xl font-black text-[#74151B] mb-2">第一關・字音初試</div>
+                    <div id="intro-avatar" class="w-24 h-24 mx-auto rounded-full border-4 border-[#D6A936] ring-2 ring-[#74151B] shadow-lg overflow-hidden mb-2 bg-amber-50"></div>
+                    <div id="intro-examiner" class="text-sm font-black text-[#74151B] mb-1.5">主考官：縣令老夫子</div>
+                    <div id="intro-desc" class="text-xs text-[#392B27] bg-[#FFFDF7]/85 border border-[#D6A936] rounded-xl p-2.5 leading-relaxed mb-2 text-left"></div>
+                    <div id="intro-rule" class="text-xs font-bold text-[#74151B] bg-[#FFF1B8]/90 border border-[#D6A936] rounded-lg py-1.5 px-2 mb-3"></div>
+                    <button onclick="beginActualQuiz()" class="btn-gold-3d w-full font-black py-2.5 rounded-xl text-base font-ui">
                         📜 領旨開考 →
                     </button>
                 </div>
@@ -1610,7 +1614,7 @@
                 const btn = document.createElement('button');
                 btn.style.animationDelay = (i * 35) + 'ms';
                 btn.dataset.opt = opt;
-                btn.className = `opt-in btn-press w-full min-h-[44px] bg-white border-2 border-b-[3px] border-[#d4af37]/85 rounded-xl py-2 px-2 ${optTextCls} font-bold text-stone-800 shadow-sm hover:border-[#991b1b] hover:bg-amber-50 flex items-center justify-between gap-1`;
+                btn.className = `opt-in btn-press w-full min-h-[44px] bg-gradient-to-b from-[#FFFDF7] to-[#F6E8C8] border-2 border-b-[3px] border-[#D6A936] rounded-xl py-2 px-2 ${optTextCls} font-bold text-[#1D1614] shadow-sm hover:border-[#74151B] hover:from-[#FFF9E9] hover:to-[#F3D77B]/60 flex items-center justify-between gap-1`;
                 btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-amber-100 border border-[#d4af37] text-[#7c1919] text-[11px] font-bold flex items-center justify-center shrink-0">${labels[i]}</span><span class="flex-1 text-center tracking-wide">${opt}</span><span class="hidden sm:inline text-[10px] text-stone-400 font-sans w-3 text-right shrink-0">${i + 1}</span>`;
                 btn.onclick = () => checkAnswer(opt, btn, q.correct);
                 optionsContainer.appendChild(btn);
