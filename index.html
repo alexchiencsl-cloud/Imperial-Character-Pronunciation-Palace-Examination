@@ -221,26 +221,32 @@
         }
         @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
         .floaty { animation: floaty 3s ease-in-out infinite; }
+        @keyframes floatScore { 0%{opacity:0;transform:translateY(8px) scale(.85)} 25%{opacity:1;transform:translateY(-6px) scale(1.08)} 100%{opacity:0;transform:translateY(-34px) scale(1)} }
+        .score-float { animation: floatScore .95s ease-out forwards; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* 手機短螢幕自適應防重疊 */
+        /* 手機短螢幕自適應防重疊與對齊修正 */
         @media (max-height: 750px) {
-            #start-screen { padding-top: 6px; padding-bottom: 6px; gap: 6px; }
-            #start-screen h1 { font-size: 1.55rem !important; }
+            #start-screen { padding-top: 6px; padding-bottom: 6px; gap: 5px; }
+            #start-screen h1 { font-size: 1.5rem !important; }
             #start-screen .royal-plaque { padding-top: 8px; padding-bottom: 6px; margin-bottom: 6px; }
             #start-screen #stage-grid button { padding: 6px; gap: 4px; }
-            #start-screen #stage-grid .w-12 { width: 2.35rem; height: 2.35rem; }
+            #start-screen #stage-grid .w-10 { width: 2.25rem; height: 2.25rem; }
             #start-screen #stage-btn-emperor { padding: 7px 10px; }
-            #start-screen #stage-btn-emperor .w-12 { width: 2.5rem; height: 2.5rem; }
+            #start-screen #stage-btn-emperor .w-12 { width: 2.4rem; height: 2.4rem; }
 
             #game-screen { padding-top: 4px; padding-bottom: 6px; gap: 4px; }
             #examiner-banner { padding: 6px 10px; gap: 8px; }
-            #examiner-avatar { width: 3rem !important; height: 3rem !important; }
+            #examiner-avatar { width: 2.85rem !important; height: 2.85rem !important; }
             .exam-scroll { padding-top: 8px; padding-bottom: 8px; }
-            .mizi-box { width: clamp(60px, 17vw, 76px); height: clamp(60px, 17vw, 76px); }
-            .mizi-text { font-size: clamp(2.1rem, 7vw, 2.8rem); }
-            #options-container button { padding-top: 7px !important; padding-bottom: 7px !important; }
+            .mizi-box { width: clamp(58px, 16.5vw, 72px); height: clamp(58px, 16.5vw, 72px); }
+            .mizi-box.md-box { width: clamp(54px, 15vw, 66px); height: clamp(54px, 15vw, 66px); }
+            .mizi-box.sm-box { width: clamp(48px, 13.5vw, 58px); height: clamp(48px, 13.5vw, 58px); }
+            .mizi-text { font-size: clamp(2rem, 6.5vw, 2.6rem); }
+            .mizi-box.md-box .mizi-text { font-size: clamp(1.85rem, 6vw, 2.35rem); }
+            .mizi-box.sm-box .mizi-text { font-size: clamp(1.65rem, 5.2vw, 2.05rem); }
+            #options-container button { padding-top: 7px !important; padding-bottom: 7px !important; min-height: 40px; }
 
             #game-over-screen { padding-top: 6px; padding-bottom: 6px; gap: 4px; }
             #bang-big-title { font-size: 1.65rem !important; }
@@ -248,8 +254,12 @@
             #result-examiner-avatar { width: 2.75rem !important; height: 2.75rem !important; }
         }
         @media (max-height: 650px) {
-            .mizi-box { width: 56px; height: 56px; }
-            .mizi-text { font-size: 1.95rem; }
+            .mizi-box { width: 54px; height: 54px; }
+            .mizi-box.md-box { width: 50px; height: 50px; }
+            .mizi-box.sm-box { width: 44px; height: 44px; }
+            .mizi-text { font-size: 1.85rem; }
+            .mizi-box.md-box .mizi-text { font-size: 1.7rem; }
+            .mizi-box.sm-box .mizi-text { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -258,16 +268,16 @@
     <div id="game-container" class="relative w-full h-[100dvh] sm:w-[430px] sm:h-[800px] sm:max-h-[96dvh] sm:rounded-2xl overflow-hidden flex flex-col palace-paper palace-frame">
 
         <!-- 頂部宮廷資訊列 -->
-        <div class="bg-gradient-to-r from-[#520c0c] via-[#7c1616] to-[#520c0c] text-[#f6dc82] px-3 py-1.5 flex justify-between items-center border-b-2 border-[#d4af37] shadow z-20 shrink-0">
-            <div class="flex items-center space-x-1.5">
-                <button id="home-btn" onclick="confirmBackToMenu()" class="hidden bg-black/25 hover:bg-black/40 border border-[#d4af37]/50 px-2 py-1 rounded-lg transition inline-flex items-center" title="回金鑾殿"><svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M2 10Q7 8 12 4Q17 8 22 10L20 11.5H4Z" fill="#f6dc82" stroke="#9a6b12" stroke-width=".7"/><path d="M5 13Q8.5 11.5 12 9.5Q15.5 11.5 19 13H5Z" fill="#d4af37"/><rect x="6" y="13" width="12" height="7" fill="#991b1b" stroke="#f6dc82" stroke-width=".7"/><rect x="10.5" y="15" width="3" height="5" fill="#450a0a"/><path d="M3 20H21V22H3Z" fill="#d4af37"/></svg></button>
-                <div class="text-base font-bold tracking-[0.12em]">御前字音殿試</div>
+        <div class="bg-gradient-to-r from-[#520c0c] via-[#7c1616] to-[#520c0c] text-[#f6dc82] px-2.5 sm:px-3 py-1.5 flex justify-between items-center gap-1 border-b-2 border-[#d4af37] shadow z-20 shrink-0">
+            <div class="flex items-center gap-1.5 min-w-0">
+                <button id="home-btn" onclick="confirmBackToMenu()" class="hidden bg-black/25 hover:bg-black/40 border border-[#d4af37]/50 px-1.5 py-1 rounded-lg transition inline-flex items-center shrink-0" title="回金鑾殿"><svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M2 10Q7 8 12 4Q17 8 22 10L20 11.5H4Z" fill="#f6dc82" stroke="#9a6b12" stroke-width=".7"/><path d="M5 13Q8.5 11.5 12 9.5Q15.5 11.5 19 13H5Z" fill="#d4af37"/><rect x="6" y="13" width="12" height="7" fill="#991b1b" stroke="#f6dc82" stroke-width=".7"/><rect x="10.5" y="15" width="3" height="5" fill="#450a0a"/><path d="M3 20H21V22H3Z" fill="#d4af37"/></svg></button>
+                <div class="text-sm sm:text-base font-bold tracking-[0.06em] sm:tracking-[0.12em] whitespace-nowrap truncate">御前字音殿試</div>
             </div>
-            <div class="flex items-center space-x-1.5">
-                <button id="bgm-btn" onclick="toggleBgm()" class="text-sm bg-black/25 hover:bg-black/40 border border-[#d4af37]/40 px-1.5 py-0.5 rounded-lg" title="宮廷雅樂開關">🎵</button>
-                <button id="mute-btn" onclick="toggleMute()" class="text-sm bg-black/25 hover:bg-black/40 border border-[#d4af37]/40 px-1.5 py-0.5 rounded-lg" title="音效開關">🔊</button>
-                <div id="score-display" class="font-bold text-xs sm:text-sm bg-black/35 border border-[#d4af37]/50 px-2.5 py-0.5 rounded-full text-amber-200">0 分</div>
-                <div id="lives-display" class="flex space-x-0.5 text-sm sm:text-base"><span>❤️</span><span>❤️</span><span>❤️</span></div>
+            <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                <button id="bgm-btn" onclick="toggleBgm()" class="text-xs sm:text-sm bg-black/25 hover:bg-black/40 border border-[#d4af37]/40 px-1.5 py-0.5 rounded-lg" title="宮廷雅樂開關">🎵</button>
+                <button id="mute-btn" onclick="toggleMute()" class="text-xs sm:text-sm bg-black/25 hover:bg-black/40 border border-[#d4af37]/40 px-1.5 py-0.5 rounded-lg" title="音效開關">🔊</button>
+                <div id="score-display" class="font-bold text-xs bg-black/35 border border-[#d4af37]/50 px-2 py-0.5 rounded-full text-amber-200 whitespace-nowrap">0 分</div>
+                <div id="lives-display" class="flex space-x-0.5 text-xs sm:text-base whitespace-nowrap"><span>❤️</span><span>❤️</span><span>❤️</span></div>
             </div>
         </div>
 
@@ -386,9 +396,12 @@
 
             <!-- 頂部進度與大考官對話欄 -->
             <div class="w-full shrink-0">
-                <div class="flex justify-between items-center text-xs text-[#5c1010] mb-1 font-bold">
-                    <span id="level-badge" class="bg-red-900/10 border border-[#d4af37] px-2.5 py-0.5 rounded-full">📖 第一關・字音初試</span>
-                    <span>第 <span id="q-progress">1/10</span> 題</span>
+                <div class="flex justify-between items-center text-xs text-[#5c1010] mb-1 font-bold gap-2">
+                    <span id="level-badge" class="bg-red-900/10 border border-[#d4af37] px-2.5 py-0.5 rounded-full truncate">📖 第一關・字音初試</span>
+                    <div class="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+                        <span id="timer-sec" class="hidden text-[11px] font-black text-amber-800 bg-amber-100 border border-amber-400 px-1.5 py-0.5 rounded-full">⏳ 12s</span>
+                        <span>第 <span id="q-progress">1/10</span> 題</span>
+                    </div>
                 </div>
                 <div class="w-full h-1.5 bg-stone-300 rounded-full mb-1 overflow-hidden">
                     <div id="progress-bar" class="h-full bg-gradient-to-r from-[#991b1b] to-[#d4af37] transition-all duration-400" style="width:0%"></div>
@@ -398,12 +411,12 @@
                 </div>
 
                 <!-- 考官大頭像對話框 -->
-                <div id="examiner-banner" class="mt-1 bg-gradient-to-r from-[#fffdf5] to-[#fbf0d4] border-2 border-[#d4af37] rounded-2xl px-2.5 py-1.5 flex items-center gap-2.5 shadow-sm">
+                <div id="examiner-banner" class="bang-card mt-1 bg-gradient-to-r from-[#fffdf5] to-[#fbf0d4] rounded-2xl px-2.5 py-1.5 flex items-center gap-2.5 shadow-sm">
                     <div id="examiner-avatar" class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full border-2 border-[#991b1b] shadow overflow-hidden bg-amber-50"></div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-0.5">
                             <span id="examiner-name" class="text-xs sm:text-sm font-black text-[#7c1919] tracking-wider">縣令老夫子</span>
-                            <span id="streak" class="text-xs text-orange-700 font-bold"></span>
+                            <span id="streak" class="text-xs text-orange-700 font-bold whitespace-nowrap"></span>
                         </div>
                         <div id="examiner-quote" class="text-xs text-stone-800 leading-snug font-medium line-clamp-2">「字音不準，何以治天下？」</div>
                     </div>
@@ -411,13 +424,14 @@
             </div>
 
             <!-- 題目御前卷軸展示區 -->
-            <div class="flex-1 shrink-0 flex flex-col items-center justify-center my-0.5">
-                <div class="exam-scroll w-full max-w-[370px] rounded-lg px-3 py-2 flex flex-col items-center justify-center">
-                    <div class="flex items-center gap-1.5 mb-1.5">
-                        <span id="rare-tag" class="hidden px-2 py-0.5 bg-red-800 text-amber-100 text-[10px] font-bold rounded-full border border-[#d4af37]">👹 魔王題</span>
+            <div class="flex-1 shrink-0 flex flex-col items-center justify-center my-0.5 relative">
+                <div id="score-float-layer" class="pointer-events-none absolute top-0 right-4 z-30"></div>
+                <div class="exam-scroll w-full max-w-[370px] rounded-lg px-2.5 py-2 flex flex-col items-center justify-center">
+                    <div class="flex items-center justify-center flex-wrap gap-1.5 mb-1.5">
+                        <span id="rare-tag" class="hidden px-2 py-0.5 bg-red-800 text-amber-100 text-[10px] font-bold rounded-full border border-[#d4af37] whitespace-nowrap">👹 魔王題</span>
                         <span id="prompt-text" class="text-stone-800 font-bold text-center text-xs sm:text-sm">請選出正確的讀音：</span>
                     </div>
-                    <div id="question-word" class="flex flex-wrap justify-center items-center gap-2"></div>
+                    <div id="question-word" class="flex flex-nowrap justify-center items-center gap-1.5 sm:gap-2 max-w-full"></div>
                 </div>
             </div>
 
@@ -1426,14 +1440,14 @@
                     ? 'bg-black/25 border-stone-500/50 text-stone-300'
                     : 'bg-[#fdf6e2] border-[#b9831a] text-stone-900 shadow-sm';
                 return `
-                    <button onclick="tryStartStage('${key}')" class="btn-press ${cardCls} rounded-xl p-2 border-2 text-left flex flex-col gap-1.5 relative overflow-hidden">
-                        <div class="flex justify-between items-center w-full">
-                            <span class="text-xs font-black truncate">第${lv.idx}關・${lv.examiner}</span>
+                    <button onclick="tryStartStage('${key}')" class="btn-press ${cardCls} rounded-xl p-1.5 sm:p-2 border-2 text-left flex flex-col gap-1.5 relative overflow-hidden">
+                        <div class="flex justify-between items-center w-full gap-1">
+                            <span class="text-[11px] sm:text-xs font-black truncate">第${lv.idx}關・${lv.examiner}</span>
                             ${badge}
                         </div>
-                        <div class="flex items-center gap-2 w-full">
-                            <div class="w-12 h-12 rounded-full overflow-hidden border-2 ${isLocked ? 'border-stone-500 grayscale' : 'border-[#854d0e] bg-amber-50'} shrink-0 shadow-sm">${EXAMINER_SVGS[key]}</div>
-                            <div class="flex-1 min-w-0 border ${scrollBadgeCls} rounded-lg px-1.5 py-1.5 text-xs font-black truncate text-center">${lv.icon} ${lv.name}</div>
+                        <div class="flex items-center gap-1.5 sm:gap-2 w-full">
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 ${isLocked ? 'border-stone-500 grayscale' : 'border-[#854d0e] bg-amber-50'} shrink-0 shadow-sm">${EXAMINER_SVGS[key]}</div>
+                            <div class="flex-1 min-w-0 border ${scrollBadgeCls} rounded-lg px-1 py-1.5 text-[11px] sm:text-xs font-black whitespace-nowrap truncate text-center">${lv.icon} ${lv.name}</div>
                         </div>
                     </button>`;
             }).join('');
@@ -1623,16 +1637,24 @@
         const clearTimer = () => clearInterval(timerId);
         function startTimer(q) {
             clearTimer();
-            const wrap = document.getElementById('timer-wrap'), bar = document.getElementById('timer-bar');
+            const wrap = document.getElementById('timer-wrap'), bar = document.getElementById('timer-bar'), secEl = document.getElementById('timer-sec');
             const timed = !!q.svg || gameMode === 'endless' || currentLevel === 'emperor';
             wrap.classList.toggle('hidden', !timed);
+            if (secEl) secEl.classList.toggle('hidden', !timed);
             if (!timed) return;
             const total = q.svg ? 15000 : 12000, t0 = Date.now();
             let lastSecTick = 4;
             bar.style.width = '100%'; bar.style.background = '#d97706';
+            if (secEl) secEl.innerText = `⏳ ${Math.ceil(total / 1000)}s`;
             timerId = setInterval(() => {
                 const elapsed = Date.now() - t0, left = 1 - elapsed / total;
-                const secLeft = Math.ceil((total - elapsed) / 1000);
+                const secLeft = Math.max(0, Math.ceil((total - elapsed) / 1000));
+                if (secEl) {
+                    secEl.innerText = `⏳ ${secLeft}s`;
+                    secEl.className = secLeft <= 3
+                        ? 'text-[11px] font-black text-red-900 bg-red-100 border border-red-400 px-1.5 py-0.5 rounded-full animate-pulse'
+                        : 'text-[11px] font-black text-amber-800 bg-amber-100 border border-amber-400 px-1.5 py-0.5 rounded-full';
+                }
                 if (secLeft <= 3 && secLeft > 0 && secLeft < lastSecTick) { lastSecTick = secLeft; sfx.tick(); }
                 bar.style.width = Math.max(0, left * 100) + '%';
                 bar.style.background = left < .3 ? '#b91c1c' : '#d97706';
@@ -1685,12 +1707,16 @@
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
             const labels = ['甲', '乙', '丙', '丁'];
+            const maxOptLen = Math.max(...q.options.map(o => o.length));
+            const optTextCls = maxOptLen >= 10
+                ? 'text-xs leading-tight whitespace-normal'
+                : (maxOptLen >= 7 ? 'text-sm leading-tight whitespace-nowrap' : 'text-base sm:text-lg whitespace-nowrap');
             shuffleArray([...q.options]).forEach((opt, i) => {
                 const btn = document.createElement('button');
                 btn.style.animationDelay = (i * 35) + 'ms';
                 btn.dataset.opt = opt;
-                btn.className = "opt-in btn-press w-full bg-white border-2 border-[#d4af37]/80 rounded-xl py-2.5 px-2 text-base sm:text-lg font-bold text-stone-800 shadow-sm hover:border-[#991b1b] hover:bg-amber-50 flex items-center justify-between gap-1";
-                btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-amber-100 border border-[#d4af37] text-[#7c1919] text-[11px] font-bold flex items-center justify-center shrink-0">${labels[i]}</span><span class="flex-1 text-center tracking-wide whitespace-nowrap">${opt}</span><span class="hidden sm:inline text-[10px] text-stone-400 font-sans w-3 text-right">${i + 1}</span>`;
+                btn.className = `opt-in btn-press w-full min-h-[44px] bg-white border-2 border-b-[3px] border-[#d4af37]/85 rounded-xl py-2 px-2 ${optTextCls} font-bold text-stone-800 shadow-sm hover:border-[#991b1b] hover:bg-amber-50 flex items-center justify-between gap-1`;
+                btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-amber-100 border border-[#d4af37] text-[#7c1919] text-[11px] font-bold flex items-center justify-center shrink-0">${labels[i]}</span><span class="flex-1 text-center tracking-wide">${opt}</span><span class="hidden sm:inline text-[10px] text-stone-400 font-sans w-3 text-right shrink-0">${i + 1}</span>`;
                 btn.onclick = () => checkAnswer(opt, btn, q.correct);
                 optionsContainer.appendChild(btn);
             });
@@ -1735,6 +1761,16 @@
             saveSavedWrongs(getSavedWrongs().filter(item => !(item.word === q.word && item.correct === q.correct)));
         }
 
+        function showScoreFloat(gained, curStreak) {
+            const layer = document.getElementById('score-float-layer');
+            if (!layer) return;
+            const el = document.createElement('div');
+            el.className = 'score-float font-black text-sm sm:text-base text-emerald-700 bg-amber-100/95 border border-[#d4af37] px-2.5 py-0.5 rounded-full shadow-md whitespace-nowrap';
+            el.innerText = curStreak >= 2 ? `+${gained} 🔥連對${curStreak}` : `+${gained}`;
+            layer.appendChild(el);
+            setTimeout(() => el.remove(), 980);
+        }
+
         function checkAnswer(selectedOption, btnElement, correctOption) {
             if (isAnswering) return;
             isAnswering = true; clearTimer(); initAudio();
@@ -1745,10 +1781,12 @@
             if (isCorrect) {
                 btnElement?.classList.add('opt-correct');
                 correctCount++; streak++;
-                score += 10 + (streak >= 2 ? Math.min(streak * 2, 10) : 0);
+                const gained = 10 + (streak >= 2 ? Math.min(streak * 2, 10) : 0);
+                score += gained;
                 streak >= 3 ? sfx.combo(streak) : sfx.correct();
                 resultHistory.push('🟩'); removeWrongFromLocal(cq);
                 showFeedback('⭕', 'text-emerald-600');
+                showScoreFloat(gained, streak);
                 document.getElementById('examiner-quote').innerText = streak >= 3 && lv.combo ? pickQuote(lv.combo) : pickQuote(lv.ok);
             } else {
                 btnElement?.classList.add('opt-wrong');
@@ -1767,7 +1805,8 @@
             document.getElementById('lifeline-bar').classList.add('hidden');
             const nb = document.getElementById('note-box');
             const statusPrefix = isCorrect ? '<span class="text-emerald-700 font-bold">⭕ 答對！</span>' : `<span class="text-red-700 font-bold">❌ 正音「${cq.correct}」</span>`;
-            document.getElementById('note-content').innerHTML = `${statusPrefix} <b>${cq.word}</b>：${cq.note || '請牢記此字標準讀音。'}`;
+            const reviewCleared = isCorrect && currentLevel === 'review' ? ' <span class="inline-block ml-1 px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[10px] font-bold">✨ 已從錯題簿消去</span>' : '';
+            document.getElementById('note-content').innerHTML = `${statusPrefix} <b>${cq.word}</b>：${cq.note || '請牢記此字標準讀音。'}${reviewCleared}`;
 
             const isLast = (lives <= 0) || (gameMode !== 'endless' && currentQuestionIndex >= questions.length - 1);
             document.getElementById('next-btn').innerText = lives <= 0 ? '查看殿試榜單（可看廣告接關） →' : (isLast ? '揭曉殿試金榜 →' : '下一題 →');
