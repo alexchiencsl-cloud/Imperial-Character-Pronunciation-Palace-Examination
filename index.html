@@ -221,6 +221,36 @@
         }
         @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
         .floaty { animation: floaty 3s ease-in-out infinite; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 手機短螢幕自適應防重疊 */
+        @media (max-height: 750px) {
+            #start-screen { padding-top: 6px; padding-bottom: 6px; gap: 6px; }
+            #start-screen h1 { font-size: 1.55rem !important; }
+            #start-screen .royal-plaque { padding-top: 8px; padding-bottom: 6px; margin-bottom: 6px; }
+            #start-screen #stage-grid button { padding: 6px; gap: 4px; }
+            #start-screen #stage-grid .w-12 { width: 2.35rem; height: 2.35rem; }
+            #start-screen #stage-btn-emperor { padding: 7px 10px; }
+            #start-screen #stage-btn-emperor .w-12 { width: 2.5rem; height: 2.5rem; }
+
+            #game-screen { padding-top: 4px; padding-bottom: 6px; gap: 4px; }
+            #examiner-banner { padding: 6px 10px; gap: 8px; }
+            #examiner-avatar { width: 3rem !important; height: 3rem !important; }
+            .exam-scroll { padding-top: 8px; padding-bottom: 8px; }
+            .mizi-box { width: clamp(60px, 17vw, 76px); height: clamp(60px, 17vw, 76px); }
+            .mizi-text { font-size: clamp(2.1rem, 7vw, 2.8rem); }
+            #options-container button { padding-top: 7px !important; padding-bottom: 7px !important; }
+
+            #game-over-screen { padding-top: 6px; padding-bottom: 6px; gap: 4px; }
+            #bang-big-title { font-size: 1.65rem !important; }
+            #final-score { font-size: 1.85rem !important; }
+            #result-examiner-avatar { width: 2.75rem !important; height: 2.75rem !important; }
+        }
+        @media (max-height: 650px) {
+            .mizi-box { width: 56px; height: 56px; }
+            .mizi-text { font-size: 1.95rem; }
+        }
     </style>
 </head>
 <body class="flex justify-center items-center">
@@ -242,7 +272,7 @@
         </div>
 
         <!-- 啟動畫面 (宮廷金殿視覺) -->
-        <div id="start-screen" class="absolute inset-0 z-50 flex flex-col justify-between items-center text-amber-50 px-3 py-2 text-center overflow-hidden">
+        <div id="start-screen" class="absolute inset-0 z-50 flex flex-col justify-between items-center gap-1.5 text-amber-50 px-3 py-2 text-center overflow-y-auto overflow-x-hidden no-scrollbar">
 
             <!-- 宮廷金殿背景 SVG (紅柱、龍旗、紅毯、祥雲) -->
             <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-45" viewBox="0 0 430 800" preserveAspectRatio="none">
@@ -351,8 +381,8 @@
             </div>
         </div>
 
-        <!-- 遊戲主要區域 (緊湊無浪費空白、大考官頭像) -->
-        <div id="game-screen" class="flex-1 flex flex-col justify-between px-3.5 py-2 hidden overflow-hidden relative">
+        <!-- 遊戲主要區域 (手機自適應防重疊) -->
+        <div id="game-screen" class="flex-1 min-h-0 flex flex-col justify-between gap-1.5 px-3.5 py-2 hidden overflow-y-auto overflow-x-hidden no-scrollbar relative">
 
             <!-- 頂部進度與大考官對話欄 -->
             <div class="w-full shrink-0">
@@ -381,7 +411,7 @@
             </div>
 
             <!-- 題目御前卷軸展示區 -->
-            <div class="flex-1 flex flex-col items-center justify-center my-1 min-h-0">
+            <div class="flex-1 shrink-0 flex flex-col items-center justify-center my-1">
                 <div class="exam-scroll w-full max-w-[370px] rounded-lg px-3 py-3 flex flex-col items-center justify-center">
                     <div class="flex items-center gap-1.5 mb-2">
                         <span id="rare-tag" class="hidden px-2.5 py-0.5 bg-red-800 text-amber-100 text-[11px] font-bold rounded-full border border-[#d4af37]">👹 魔王題</span>
@@ -431,7 +461,7 @@
         </div>
 
         <!-- 古典榜單結算畫面 (御前黃綾金榜捲軸) -->
-        <div id="game-over-screen" class="absolute inset-0 z-40 hidden px-3 py-2 flex flex-col justify-between items-center gap-1.5 overflow-hidden">
+        <div id="game-over-screen" class="absolute inset-0 z-40 hidden px-3 py-2 flex flex-col justify-between items-center gap-1.5 overflow-y-auto overflow-x-hidden no-scrollbar">
 
             <!-- 宮廷屋簷、燈籠與金光放射背景 SVG -->
             <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-45" viewBox="0 0 430 800" preserveAspectRatio="none">
@@ -475,10 +505,10 @@
                 <div id="bang-header" class="text-[10px] tracking-[0.2em] text-amber-200/90 font-bold mt-0.5">─── ○ 奉天承運・翰林院金榜題名 ○ ───</div>
             </div>
 
-            <!-- 主捲軸畫布 (自適應撐滿剩餘高度、無多餘空白) -->
-            <div id="report-card" class="relative w-full max-w-[378px] flex-1 min-h-0 flex flex-col justify-between z-10 mx-1">
+            <!-- 主捲軸畫布 (自適應撐滿剩餘高度、手機防重疊) -->
+            <div id="report-card" class="relative w-full max-w-[378px] flex-1 shrink-0 flex flex-col justify-between z-10 mx-1">
                 <!-- 宣紙黃綾榜身 -->
-                <div id="scroll-inner" class="flex-1 min-h-0 mx-1.5 rounded-xl border-2 border-[#d4af37] bg-gradient-to-b from-[#fffaf0] via-[#f8ebd0] to-[#f1dcad] shadow-[0_10px_28px_rgba(0,0,0,0.65)] px-3 py-2 flex flex-col justify-between gap-1.5 text-stone-900 relative overflow-hidden">
+                <div id="scroll-inner" class="flex-1 mx-1.5 rounded-xl border-2 border-[#d4af37] bg-gradient-to-b from-[#fffaf0] via-[#f8ebd0] to-[#f1dcad] shadow-[0_10px_28px_rgba(0,0,0,0.65)] px-3 py-2 flex flex-col justify-between gap-1.5 text-stone-900 relative overflow-x-hidden">
                     <!-- 祥雲浮水印 SVG -->
                     <svg class="pointer-events-none absolute -right-4 top-12 w-32 h-32 opacity-10" viewBox="0 0 100 100">
                         <path d="M20 65 Q30 45 50 50 Q65 35 80 50 Q92 55 85 70 Q70 80 45 75 Q25 80 20 65Z" fill="#9a6b12"/>
