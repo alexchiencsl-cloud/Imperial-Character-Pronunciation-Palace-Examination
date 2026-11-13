@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>御前字音殿試</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&display=swap');
+
+        :root {
+            --palace-red: #6b1414;
+            --palace-gold: #d4af37;
+            --palace-gold-light: #f6dc82;
+            --xuan-paper: #f8f0dc;
+        }
+
+        html, body {
+            height: 100dvh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'BiauKai', 'DFKai-SB', 'Noto Serif TC', serif;
+            background: radial-gradient(circle at center, #4a0e0e 0%, #1d0404 100%);
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .palace-paper {
+            background-color: var(--xuan-paper);
+            background-image:
+                radial-gradient(rgba(180, 130, 50, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(212, 175, 55, 0.08), rgba(139, 90, 43, 0.1));
+            background-size: 16px 16px, 100% 100%;
+        }
+
+        .palace-frame {
+            border: 3px solid var(--palace-gold);
+            box-shadow: 0 0 0 3px #4e0d0d, 0 18px 40px rgba(0, 0, 0, 0.75);
+        }
+
+        .plaque {
+            background: linear-gradient(180deg, #691212 0%, #3d0707 100%);
+            border: 2.5px solid var(--palace-gold);
+            box-shadow: inset 0 0 12px rgba(246, 220, 130, 0.28), 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        /* 御前考題卷軸框 */
+        .exam-scroll {
+            position: relative;
+            background: linear-gradient(180deg, #fffdf6 0%, #fbf2dc 100%);
+            border-top: 3px solid #991b1b;
+            border-bottom: 3px solid #991b1b;
+            border-left: 1.5px solid #d4af37;
+            border-right: 1.5px solid #d4af37;
+            box-shadow: inset 0 0 18px rgba(212, 175, 55, 0.18), 0 6px 16px rgba(92, 16, 16, 0.14);
+        }
+        .exam-scroll::before, .exam-scroll::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            bottom: -5px;
+            width: 8px;
+            background: linear-gradient(180deg, #f6dc82 0%, #b8860b 50%, #f6dc82 100%);
+            border: 1.5px solid #5c1010;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .exam-scroll::before { left: -6px; }
+        .exam-scroll::after { right: -6px; }
+
+        /* 放大版米字格 */
+        .mizi-box {
+            position: relative;
+            width: clamp(78px, 21vw, 94px);
+            height: clamp(78px, 21vw, 94px);
+            border: 3px solid #991b1b;
+            background-color: #fffef9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(107, 20, 20, 0.18);
+            animation: rise .26s ease-out both;
+            border-radius: 6px;
+        }
+        .mizi-box.md-box { width: clamp(68px, 18vw, 82px); height: clamp(68px, 18vw, 82px); }
+        .mizi-box.sm-box { width: clamp(58px, 15.5vw, 70px); height: clamp(58px, 15.5vw, 70px); }
+        .mizi-box.cover-box { width: 50px; height: 50px; border-width: 2.5px; }
+        .mizi-box.target-box {
+            border-color: #b91c1c;
+            background-color: #fef2f2;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.7), 0 4px 10px rgba(153, 27, 27, 0.28);
+        }
+        .mizi-box.target-box .mizi-text { color: #b91c1c; }
+
+        .mizi-lines {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(to bottom, transparent 49%, rgba(185, 28, 28, 0.28) 49%, rgba(185, 28, 28, 0.28) 51%, transparent 51%),
+                linear-gradient(to right, transparent 49%, rgba(185, 28, 28, 0.28) 49%, rgba(185, 28, 28, 0.28) 51%, transparent 51%),
+                linear-gradient(45deg, transparent 49%, rgba(185, 28, 28, 0.14) 49%, rgba(185, 28, 28, 0.14) 51%, transparent 51%),
+                linear-gradient(-45deg, transparent 49%, rgba(185, 28, 28, 0.14) 49%, rgba(185, 28, 28, 0.14) 51%, transparent 51%);
+            z-index: 1;
+        }
+
+        .mizi-text {
+            position: relative;
+            z-index: 2;
+            font-size: clamp(2.8rem, 8.5vw, 3.5rem);
+            color: #1c1917;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .mizi-box.md-box .mizi-text { font-size: clamp(2.4rem, 7.2vw, 2.95rem); }
+        .mizi-box.sm-box .mizi-text { font-size: clamp(2.05rem, 6.2vw, 2.55rem); }
+        .mizi-box.cover-box .mizi-text { font-size: 1.85rem; }
+
+        .btn-press { transition: transform 0.1s ease, filter 0.15s ease; }
+        .btn-press:active { transform: scale(0.96); }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .shake-animation { animation: shake 0.38s ease-in-out; }
+
+        @keyframes pop { 0%{scale:.3} 60%{scale:1.22} 100%{scale:1} }
+        @keyframes rise { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+        .opt-in { animation: rise .22s ease-out both; }
+        .opt-correct { background:#dcfce7!important; border-color:#15803d!important; color:#14532d!important; }
+        .opt-wrong { background:#fee2e2!important; border-color:#b91c1c!important; color:#7f1d1d!important; }
+        .opt-eliminated { opacity:0.28!important; pointer-events:none!important; text-decoration:line-through; }
+
+        @keyframes stampIn { from{scale:2.8;opacity:0} to{scale:1;opacity:.92} }
+        .stamp {
+            border: 3.5px solid currentColor;
+            border-radius: 8px;
+            padding: 2px 10px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            transform: rotate(-10deg);
+            opacity: 0;
+            mix-blend-mode: multiply;
+            letter-spacing: 0.1em;
+        }
+        .stamp.in { animation: stampIn .45s cubic-bezier(.2,1.6,.4,1) .2s both; }
+
+        #start-screen {
+            background:
+                radial-gradient(circle at 50% 18%, rgba(246, 220, 130, 0.22) 0%, transparent 52%),
+                radial-gradient(ellipse at bottom, rgba(160, 25, 25, 0.45) 0%, transparent 60%),
+                linear-gradient(180deg, #5c0e0e 0%, #3a0707 52%, #1f0303 100%);
+        }
+        #game-over-screen {
+            background:
+                radial-gradient(circle at 50% 16%, rgba(246, 220, 130, 0.2) 0%, transparent 50%),
+                linear-gradient(180deg, #580d0d 0%, #340606 55%, #1c0303 100%);
+        }
+        #game-over-screen.emperor-pass-mode {
+            background:
+                radial-gradient(circle at 50% 18%, rgba(254, 240, 138, 0.4) 0%, transparent 55%),
+                linear-gradient(180deg, #854d0e 0%, #6b1414 48%, #220404 100%);
+        }
+        #game-over-screen.emperor-pass-mode #scroll-inner {
+            border-width: 3px;
+            border-color: #fef08a;
+            background: linear-gradient(180deg, #fffef5 0%, #fef3c7 55%, #fde68a 100%);
+            box-shadow: 0 0 28px rgba(254, 240, 138, 0.45), 0 12px 30px rgba(0, 0, 0, 0.7);
+        }
+        .gold-text {
+            background: linear-gradient(180deg, #fff7cc 0%, #f6dc82 42%, #d4af37 78%, #9a6b12 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.75));
+        }
+        .wood-plaque {
+            background: linear-gradient(180deg, #3c1810 0%, #240d08 100%);
+            border: 1.5px solid #c99e32;
+            box-shadow: inset 0 1px 0 rgba(255, 232, 150, 0.25), 0 4px 12px rgba(0, 0, 0, 0.55);
+        }
+        .royal-plaque {
+            background: linear-gradient(180deg, #7d1515 0%, #4d0909 100%);
+            border: 2px solid #e5b94c;
+            box-shadow: inset 0 0 16px rgba(246, 220, 130, 0.28), 0 6px 18px rgba(0, 0, 0, 0.65);
+        }
+        .bang-card {
+            position: relative;
+            border: 1.5px solid #c59b38;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 3px 10px rgba(0, 0, 0, 0.38);
+        }
+        .bang-card::before, .bang-card::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border: 2px solid #9a6b12;
+            pointer-events: none;
+        }
+        .bang-card::before { top: 2px; left: 2px; border-right: 0; border-bottom: 0; }
+        .bang-card::after { bottom: 2px; right: 2px; border-left: 0; border-top: 0; }
+        .stamp {
+            border: 3px solid currentColor;
+            outline: 1.5px solid currentColor;
+            outline-offset: 2px;
+            border-radius: 6px;
+            padding: 2px 12px;
+            font-size: 1.75rem;
+            font-weight: 900;
+            transform: rotate(-10deg);
+            opacity: 0;
+            mix-blend-mode: multiply;
+            letter-spacing: 0.14em;
+            background: rgba(185, 28, 28, 0.06);
+        }
+        @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+        .floaty { animation: floaty 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="flex justify-center items-center">
+
+    <div id="game-container" class="relative w-full h-[100dvh] sm:w-[430px] sm:h-[800px] sm:max-h-[96dvh] sm:rounded-2xl overflow-hidden flex flex-col palace-paper palace-frame">
+
+        <!-- 頂部宮廷資訊列 -->
+        <div class="bg-gradient-to-r from-[#520c0c] via-[#7c1616] to-[#520c0c] text-[#f6dc82] px-3 py-1.5 flex justify-between items-center border-b-2 border-[#d4af37] shadow z-20 shrink-0">
+            <div class="flex items-center space-x-1.5">
+                <button id="home-btn" onclick="confirmBackToMenu()" class="hidden bg-black/25 hover:bg-black/40 border border-[#d4af37]/50 px-2 py-1 rounded-lg transition inline-flex items-center" title="回金鑾殿"><svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M2 10Q7 8 12 4Q17 8 22 10L20 11.5H4Z" fill="#f6dc82" stroke="#9a6b12" stroke-width=".7"/><path d="M5 13Q8.5 11.5 12 9.5Q15.5 11.5 19 13H5Z" fill="#d4af37"/><rect x="6" y="13" width="12" height="7" fill="#991b1b" stroke="#f6dc82" stroke-width=".7"/><rect x="10.5" y="15" width="3" height="5" fill="#450a0a"/><path d="M3 20H21V22H3Z" fill="#d4af37"/></svg></button>
+                <div class="text-base font-bold tracking-[0.12em]">御前字音殿試</div>
+            </div>
+            <div class="flex items-center space-x-1.5">
+                <button id="bgm-btn" onclick="toggleBgm()" class="text-sm bg-black/25 hover:bg-black/40 border border-[#d4af37]/40 px-1.5 py-0.5 rounded-lg" title="宮廷雅樂開關">🎵</button>
+                <button id="mute-btn" onclick="toggleMute()" class="text-sm bg-black/25 hover:bg-black/40 border border-[#d4af37]/40 px-1.5 py-0.5 rounded-lg" title="音效開關">🔊</button>
+                <div id="score-display" class="font-bold text-xs sm:text-sm bg-black/35 border border-[#d4af37]/50 px-2.5 py-0.5 rounded-full text-amber-200">0 分</div>
+                <div id="lives-display" class="flex space-x-0.5 text-sm sm:text-base"><span>❤️</span><span>❤️</span><span>❤️</span></div>
+            </div>
+        </div>
+
+        <!-- 啟動畫面 (宮廷金殿視覺) -->
+        <div id="start-screen" class="absolute inset-0 z-50 flex flex-col justify-between items-center text-amber-50 px-3 py-2 text-center overflow-hidden">
+
+            <!-- 宮廷金殿背景 SVG (紅柱、龍旗、紅毯、祥雲) -->
+            <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-45" viewBox="0 0 430 800" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="pillarG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3b0707"/><stop offset=".45" stop-color="#8b1a1a"/><stop offset="1" stop-color="#2b0404"/></linearGradient>
+                    <linearGradient id="carpetG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7f1d1d" stop-opacity=".2"/><stop offset="1" stop-color="#991b1b" stop-opacity=".85"/></linearGradient>
+                </defs>
+                <!-- 左右大柱 -->
+                <rect x="8" y="0" width="32" height="800" fill="url(#pillarG)"/>
+                <rect x="390" y="0" width="32" height="800" fill="url(#pillarG)"/>
+                <!-- 左右龍旗燈籠 -->
+                <rect x="12" y="68" width="24" height="96" rx="6" fill="#991b1b" stroke="#d4af37" stroke-width="1.5"/>
+                <rect x="394" y="68" width="24" height="96" rx="6" fill="#991b1b" stroke="#d4af37" stroke-width="1.5"/>
+                <!-- 殿前紅毯 -->
+                <polygon points="145,270 285,270 365,800 65,800" fill="url(#carpetG)"/>
+                <line x1="150" y1="270" x2="75" y2="800" stroke="#d4af37" stroke-width="1.5" stroke-opacity=".5"/>
+                <line x1="280" y1="270" x2="355" y2="800" stroke="#d4af37" stroke-width="1.5" stroke-opacity=".5"/>
+                <!-- 底部祥雲 -->
+                <path d="M0 785 Q35 760 70 780 Q105 765 130 795 L0 800Z" fill="#7c1919" stroke="#d4af37" stroke-width="1" stroke-opacity=".4"/>
+                <path d="M430 785 Q395 760 360 780 Q325 765 300 795 L430 800Z" fill="#7c1919" stroke="#d4af37" stroke-width="1" stroke-opacity=".4"/>
+            </svg>
+
+            <!-- 頂部列 -->
+            <div class="w-full flex flex-col gap-1 shrink-0 relative z-10">
+                <div class="w-full flex justify-between items-center text-[11px]">
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-bold tracking-wider text-[#f6dc82] flex items-center gap-1"><svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path d="M2 10Q7 8 12 4Q17 8 22 10L20 11.5H4Z" fill="#f6dc82" stroke="#9a6b12" stroke-width=".7"/><path d="M5 13Q8.5 11.5 12 9.5Q15.5 11.5 19 13H5Z" fill="#d4af37"/><rect x="6" y="13" width="12" height="7" fill="#991b1b" stroke="#f6dc82" stroke-width=".7"/><rect x="10.5" y="15" width="3" height="5" fill="#450a0a"/><path d="M3 20H21V22H3Z" fill="#d4af37"/></svg><span>御前字音殿試</span></span>
+                        <button onclick="openBrowserHelper()" class="bg-[#2a0c08]/85 border border-[#d4af37]/60 text-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1 hover:bg-[#3d140d]">
+                            <span>🌐</span><span>外開</span>
+                        </button>
+                    </div>
+                    <div class="flex space-x-1">
+                        <button onclick="toggleBgm()" id="start-bgm-btn" class="bg-[#2a0c08]/85 border border-[#d4af37]/55 px-2 py-0.5 rounded-full text-amber-200">🎵 雅樂：開</button>
+                        <button onclick="toggleMute()" id="start-sfx-btn" class="bg-[#2a0c08]/85 border border-[#d4af37]/55 px-2 py-0.5 rounded-full text-amber-200">🔊 音：開</button>
+                    </div>
+                </div>
+                <div id="inapp-warning" class="hidden w-full bg-amber-400/95 text-red-950 text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-200 flex items-center justify-between gap-1.5">
+                    <span class="text-left leading-tight">⚠️ LINE/Threads 內建瀏覽器點廣告易跳不回來</span>
+                    <button onclick="openBrowserHelper()" class="shrink-0 bg-red-800 text-amber-100 px-2 py-0.5 rounded text-xs">外開/複製</button>
+                </div>
+            </div>
+
+            <!-- 玉璽金匾 & 殿試紀錄 -->
+            <div class="flex flex-col items-center shrink-0 relative z-10 w-full max-w-[375px]">
+                <!-- 玉璽 SVG -->
+                <svg viewBox="0 0 60 36" class="w-12 h-8 -mb-2.5 relative z-20 drop-shadow-[0_3px_4px_rgba(0,0,0,0.6)]">
+                    <defs><linearGradient id="jadeG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a7f3d0"/><stop offset=".5" stop-color="#34d399"/><stop offset="1" stop-color="#065f46"/></linearGradient></defs>
+                    <path d="M22 14 C22 7 38 7 38 14 L40 20 L20 20 Z" fill="url(#jadeG)" stroke="#064e3b" stroke-width="1"/>
+                    <circle cx="30" cy="10" r="4" fill="#6ee7b7" stroke="#064e3b" stroke-width="1"/>
+                    <rect x="13" y="19" width="34" height="12" rx="2" fill="url(#jadeG)" stroke="#d4af37" stroke-width="1.2"/>
+                    <rect x="16" y="29" width="28" height="4" rx="1" fill="#065f46" stroke="#f6dc82" stroke-width=".8"/>
+                </svg>
+
+                <!-- 皇家龍紋匾額 (點匾可試聽宮廷序曲) -->
+                <div onclick="playCoverPreview()" class="royal-plaque w-full rounded-2xl px-4 pt-3.5 pb-2.5 mb-2 relative cursor-pointer">
+                    <div class="absolute top-1.5 left-2.5 text-[#d4af37]/65 text-xs">❖</div>
+                    <div class="absolute top-1.5 right-2.5 text-[#d4af37]/65 text-xs">❖</div>
+                    <h1 class="gold-text text-[30px] sm:text-[34px] font-black tracking-[0.2em] leading-tight">御前字音殿試</h1>
+                    <div class="text-xs tracking-[0.3em] text-[#f6dc82] font-bold mt-1">❖ 五關科舉破關制 ❖</div>
+                </div>
+
+                <!-- 殿試紀錄木匾 -->
+                <div class="wood-plaque w-full rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-left mb-1.5">
+                    <span class="text-xs font-black text-[#f6dc82] shrink-0">🏆 殿試紀錄</span>
+                    <div id="best-start" class="text-xs text-amber-100 font-bold truncate text-right flex-1">尚無紀錄</div>
+                </div>
+
+                <!-- 考生姓名輸入木匾 -->
+                <div class="wood-plaque w-full rounded-xl px-3 py-1.5 flex items-center gap-2 text-left">
+                    <label for="player-name-input" class="text-xs font-black text-[#f6dc82] shrink-0">🖋️ 考生大名</label>
+                    <input id="player-name-input" type="text" maxlength="10" oninput="savePlayerName(this.value)" placeholder="請輸入姓名（題名金榜用）" class="flex-1 min-w-0 bg-black/45 border border-[#d4af37]/50 focus:border-[#f6dc82] rounded-lg px-2.5 py-1 text-xs font-bold text-amber-50 placeholder-amber-200/50 outline-none" />
+                </div>
+            </div>
+
+            <!-- 接續上次未完成進度 -->
+            <div id="resume-card" class="hidden w-full max-w-[375px] bg-gradient-to-r from-amber-500/25 to-yellow-600/25 border-2 border-[#f6dc82] rounded-xl px-3 py-1 flex items-center justify-between gap-2 shrink-0 relative z-10">
+                <div class="text-left">
+                    <div class="text-xs font-bold text-[#f6dc82]">📜 接續上次未完殿試</div>
+                    <div id="resume-info" class="text-[11px] text-amber-100"></div>
+                </div>
+                <div class="flex space-x-1.5 shrink-0">
+                    <button onclick="resumeSavedGame()" class="btn-press bg-[#f6dc82] text-red-950 font-bold text-xs px-2.5 py-1 rounded-lg">繼續</button>
+                    <button onclick="discardSavedGame()" class="btn-press bg-black/40 text-amber-200 text-xs px-2 py-1 rounded-lg">捨棄</button>
+                </div>
+            </div>
+
+            <!-- 模式切換 -->
+            <div class="w-full max-w-[375px] wood-plaque rounded-full p-1 flex shrink-0 relative z-10">
+                <button id="mode-standard" onclick="setMode('standard')" class="flex-1 py-1 text-xs font-black rounded-full bg-gradient-to-b from-[#fce694] to-[#cfa12e] text-red-950 shadow">🎯 破關試煉 (10題)</button>
+                <button id="mode-endless" onclick="setMode('endless')" class="flex-1 py-1 text-xs font-bold rounded-full text-amber-100 hover:bg-white/10">♾️ 無盡科舉</button>
+            </div>
+
+            <!-- 5大關卡破關選單 -->
+            <div class="w-full max-w-[375px] flex flex-col gap-1.5 shrink-0 relative z-10">
+                <div id="stage-grid" class="grid grid-cols-2 gap-2 w-full"></div>
+                <button id="stage-btn-emperor" onclick="tryStartStage('emperor')" class="btn-press w-full rounded-xl p-2 shadow-lg border-2 flex items-center justify-between text-left transition"></button>
+            </div>
+
+            <!-- 底部錯題簿 & 提示 -->
+            <div class="w-full max-w-[375px] flex flex-col items-center gap-0.5 shrink-0 relative z-10">
+                <button id="review-btn" onclick="startReviewMode()" class="hidden btn-press w-full wood-plaque hover:brightness-110 text-[#f6dc82] text-xs font-bold py-1.5 px-3 rounded-full flex items-center justify-between">
+                    <span>🖌️ 御批錯題簿 (<span id="saved-wrong-count">0</span> 題待溫習)</span>
+                    <span class="text-amber-300">›</span>
+                </button>
+                <div class="text-[10px] text-amber-200/80">每關答對 6 題（60%）方可晉級｜支援鍵盤 1-4</div>
+            </div>
+        </div>
+
+        <!-- 遊戲主要區域 (緊湊無浪費空白、大考官頭像) -->
+        <div id="game-screen" class="flex-1 flex flex-col justify-between px-3.5 py-2 hidden overflow-hidden relative">
+
+            <!-- 頂部進度與大考官對話欄 -->
+            <div class="w-full shrink-0">
+                <div class="flex justify-between items-center text-xs text-[#5c1010] mb-1 font-bold">
+                    <span id="level-badge" class="bg-red-900/10 border border-[#d4af37] px-2.5 py-0.5 rounded-full">📖 第一關・字音初試</span>
+                    <span>第 <span id="q-progress">1/10</span> 題</span>
+                </div>
+                <div class="w-full h-1.5 bg-stone-300 rounded-full mb-1 overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-[#991b1b] to-[#d4af37] transition-all duration-400" style="width:0%"></div>
+                </div>
+                <div id="timer-wrap" class="hidden w-full h-1.5 bg-stone-300 rounded-full mb-1 overflow-hidden">
+                    <div id="timer-bar" class="h-full bg-amber-500" style="width:100%"></div>
+                </div>
+
+                <!-- 考官大頭像對話框 -->
+                <div id="examiner-banner" class="mt-1 bg-gradient-to-r from-[#fffdf5] to-[#fbf0d4] border-2 border-[#d4af37] rounded-2xl px-3 py-2 flex items-center gap-3 shadow-sm">
+                    <div id="examiner-avatar" class="w-16 h-16 shrink-0 rounded-full border-2 border-[#991b1b] shadow overflow-hidden bg-amber-50"></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-0.5">
+                            <span id="examiner-name" class="text-sm font-black text-[#7c1919] tracking-wider">縣令老夫子</span>
+                            <span id="streak" class="text-xs text-orange-700 font-bold"></span>
+                        </div>
+                        <div id="examiner-quote" class="text-xs sm:text-sm text-stone-800 leading-snug font-medium">「字音不準，何以治天下？」</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 題目御前卷軸展示區 -->
+            <div class="flex-1 flex flex-col items-center justify-center my-1 min-h-0">
+                <div class="exam-scroll w-full max-w-[370px] rounded-lg px-3 py-3 flex flex-col items-center justify-center">
+                    <div class="flex items-center gap-1.5 mb-2">
+                        <span id="rare-tag" class="hidden px-2.5 py-0.5 bg-red-800 text-amber-100 text-[11px] font-bold rounded-full border border-[#d4af37]">👹 魔王題</span>
+                        <span id="prompt-text" class="text-stone-800 font-bold text-center text-sm sm:text-base">請選出正確的讀音：</span>
+                    </div>
+                    <div id="question-word" class="flex flex-wrap justify-center items-center gap-2"></div>
+                </div>
+            </div>
+
+            <div id="feedback-icon" class="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold opacity-0 transition-opacity duration-200 pointer-events-none z-30">⭕</div>
+
+            <!-- 選項與作答後操作區 -->
+            <div class="w-full flex flex-col justify-end shrink-0 gap-1.5">
+                <div id="options-container" class="grid grid-cols-1 gap-1.5 w-full"></div>
+
+                <div id="lifeline-bar" class="flex justify-center gap-2 w-full pt-0.5">
+                    <button id="hint-5050-btn" onclick="useEliminateHint()" class="btn-press flex-1 text-xs bg-white border-2 border-[#d4af37] text-stone-800 font-bold py-2 px-2 rounded-xl shadow-sm">
+                        ✂️ 免費刪去 (<span id="hint-5050-count">1</span>)
+                    </button>
+                    <button id="ad-help-btn" onclick="watchAdForHelp()" class="btn-press flex-1 text-xs bg-gradient-to-r from-amber-400 to-yellow-500 text-red-950 font-bold py-2 px-2 rounded-xl shadow border border-amber-300">
+                        📺 看廣告求救 (刪兩錯項)
+                    </button>
+                </div>
+
+                <div id="note-box" class="hidden w-full bg-amber-50 border-2 border-[#d4af37] rounded-xl p-2.5 text-stone-800 shadow">
+                    <div id="note-content" class="text-xs sm:text-sm leading-snug mb-2"></div>
+                    <button id="next-btn" onclick="manualNext()" class="btn-press w-full bg-gradient-to-r from-[#7c1919] to-[#991b1b] text-[#f6dc82] font-bold py-2 rounded-lg text-sm border border-[#d4af37] shadow">
+                        下一題 →
+                    </button>
+                </div>
+            </div>
+
+            <!-- 開考前考官宣旨說明彈窗 -->
+            <div id="intro-overlay" class="hidden absolute inset-0 z-40 bg-black/75 flex items-center justify-center p-4">
+                <div class="palace-paper border-4 border-[#d4af37] rounded-2xl p-4 max-w-xs w-full text-stone-900 shadow-2xl text-center relative">
+                    <div class="text-xs tracking-[0.3em] text-[#991b1b] font-bold mb-1">奉旨開考・試場須知</div>
+                    <div id="intro-stage-title" class="text-xl font-black text-[#7c1919] mb-2">第一關・字音初試</div>
+                    <div id="intro-avatar" class="w-24 h-24 mx-auto rounded-full border-3 border-[#991b1b] shadow-lg overflow-hidden mb-2 bg-amber-50"></div>
+                    <div id="intro-examiner" class="text-sm font-black text-[#7c1919] mb-1.5">主考官：縣令老夫子</div>
+                    <div id="intro-desc" class="text-xs text-stone-800 bg-white/80 border border-[#d4af37] rounded-xl p-2.5 leading-relaxed mb-2.5 text-left"></div>
+                    <div id="intro-rule" class="text-xs font-bold text-red-900 bg-amber-100 border border-amber-400 rounded-lg py-1.5 px-2 mb-3"></div>
+                    <button onclick="beginActualQuiz()" class="btn-press w-full bg-gradient-to-r from-[#7c1919] to-[#991b1b] text-[#f6dc82] font-black py-2.5 rounded-xl text-base border-2 border-[#d4af37] shadow-lg">
+                        📜 領旨開考 →
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 古典榜單結算畫面 (御前黃綾金榜捲軸) -->
+        <div id="game-over-screen" class="absolute inset-0 z-40 hidden px-3 py-2 flex flex-col justify-between items-center gap-1.5 overflow-hidden">
+
+            <!-- 宮廷屋簷、燈籠與金光放射背景 SVG -->
+            <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-45" viewBox="0 0 430 800" preserveAspectRatio="none">
+                <defs>
+                    <radialGradient id="haloG" cx="50%" cy="18%" r="48%"><stop offset="0" stop-color="#fde68a" stop-opacity=".42"/><stop offset="1" stop-color="#fde68a" stop-opacity="0"/></radialGradient>
+                </defs>
+                <rect width="430" height="800" fill="url(#haloG)"/>
+                <path d="M0 70 Q50 65 95 30 L0 30Z" fill="#2b0404" stroke="#d4af37" stroke-width="1"/>
+                <path d="M430 70 Q380 65 335 30 L430 30Z" fill="#2b0404" stroke="#d4af37" stroke-width="1"/>
+                <rect x="6" y="545" width="20" height="54" rx="5" fill="#d97706" stroke="#fde68a" stroke-width="1.5" opacity=".55"/>
+                <rect x="404" y="545" width="20" height="54" rx="5" fill="#d97706" stroke="#fde68a" stroke-width="1.5" opacity=".55"/>
+            </svg>
+
+            <!-- 頂部放榜標題區 -->
+            <div class="w-full max-w-[378px] shrink-0 z-10 text-center">
+                <svg viewBox="0 0 360 30" class="w-full h-6 block drop-shadow -mb-1">
+                    <defs>
+                        <linearGradient id="rodGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#fef08a"/><stop offset=".5" stop-color="#d4af37"/><stop offset="1" stop-color="#854d0e"/>
+                        </linearGradient>
+                        <linearGradient id="jadeBang" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#064e3b"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="10" y="9" width="340" height="11" rx="5.5" fill="url(#rodGrad)" stroke="#450a0a" stroke-width="1.5"/>
+                    <rect x="0" y="5" width="16" height="19" rx="3" fill="url(#rodGrad)" stroke="#450a0a" stroke-width="1.5"/>
+                    <rect x="344" y="5" width="16" height="19" rx="3" fill="url(#rodGrad)" stroke="#450a0a" stroke-width="1.5"/>
+                    <circle cx="180" cy="15" r="13.5" fill="url(#jadeBang)" stroke="#f6dc82" stroke-width="2"/>
+                    <text x="180" y="20" text-anchor="middle" fill="#fef08a" font-size="13.5" font-weight="900">榜</text>
+                </svg>
+                <!-- 皇帝御前欽點雙龍皇冠徽章 (僅第五關過關顯示) -->
+                <div id="emperor-crest" class="hidden flex items-center justify-center gap-2 -mb-1 mt-0.5">
+                    <span class="text-lg">🐉</span>
+                    <span class="px-3 py-0.5 rounded-full bg-gradient-to-r from-[#fef08a] via-[#f59e0b] to-[#fef08a] text-red-950 text-[10px] font-black tracking-[0.2em] border border-red-900 shadow">👑 皇帝御前欽點 👑</span>
+                    <span class="text-lg scale-x-[-1] inline-block">🐉</span>
+                </div>
+                <div id="bang-big-title" class="gold-text text-[32px] font-black tracking-[0.26em] leading-none mt-0.5">金榜題名</div>
+                <div class="royal-plaque inline-block px-5 py-0.5 rounded-full mt-1">
+                    <span id="report-title" class="text-xs font-black tracking-[0.18em] text-[#f6dc82]">字音初試・及第金榜</span>
+                </div>
+                <div id="bang-header" class="text-[10px] tracking-[0.2em] text-amber-200/90 font-bold mt-0.5">─── ○ 奉天承運・翰林院金榜題名 ○ ───</div>
+            </div>
+
+            <!-- 主捲軸畫布 (自適應撐滿剩餘高度、無多餘空白) -->
+            <div id="report-card" class="relative w-full max-w-[378px] flex-1 min-h-0 flex flex-col justify-between z-10 mx-1">
+                <!-- 宣紙黃綾榜身 -->
+                <div id="scroll-inner" class="flex-1 min-h-0 mx-1.5 rounded-xl border-2 border-[#d4af37] bg-gradient-to-b from-[#fffaf0] via-[#f8ebd0] to-[#f1dcad] shadow-[0_10px_28px_rgba(0,0,0,0.65)] px-3 py-2 flex flex-col justify-between gap-1.5 text-stone-900 relative overflow-hidden">
+                    <!-- 祥雲浮水印 SVG -->
+                    <svg class="pointer-events-none absolute -right-4 top-12 w-32 h-32 opacity-10" viewBox="0 0 100 100">
+                        <path d="M20 65 Q30 45 50 50 Q65 35 80 50 Q92 55 85 70 Q70 80 45 75 Q25 80 20 65Z" fill="#9a6b12"/>
+                    </svg>
+
+                    <!-- 1. 考生題名錦條 -->
+                    <div class="bg-gradient-to-r from-[#7c1919] via-[#991b1b] to-[#7c1919] border border-[#d4af37] rounded-lg px-3 py-1 flex items-center justify-between text-[#f6dc82] shadow-sm shrink-0">
+                        <span class="text-[11px] font-bold tracking-wider">📜 欽定考生</span>
+                        <span id="bang-player-name" class="text-sm sm:text-base font-black tracking-[0.18em] text-white truncate max-w-[170px]">無名舉子</span>
+                        <span id="accuracy-badge" class="text-[11px] font-bold text-amber-200">答對 0/0</span>
+                    </div>
+
+                    <!-- 2. 總分與御璽印章 -->
+                    <div class="bang-card rounded-xl bg-gradient-to-br from-[#fffdf7] to-[#f4e4bf] px-3.5 py-2 flex items-center justify-between shrink-0">
+                        <div>
+                            <div class="text-xs text-stone-600 font-bold">殿試總分</div>
+                            <div class="flex items-baseline gap-2">
+                                <div id="final-score" class="text-4xl font-black text-[#7c1919] leading-none">0</div>
+                                <div class="text-[11px] font-bold text-amber-800"><span id="record-tag"></span>最高 <span id="best-score">0</span></div>
+                            </div>
+                        </div>
+                        <div id="grade-stamp" class="stamp text-red-700">落第</div>
+                    </div>
+
+                    <!-- 3. 考官宣榜評語卡 -->
+                    <div class="bang-card rounded-xl bg-gradient-to-br from-[#f4faee] to-[#e4f2d9] px-3 py-2 flex items-center gap-2.5 shrink-0">
+                        <div id="result-examiner-avatar" class="w-14 h-14 shrink-0 rounded-full border-2 border-[#065f46] overflow-hidden bg-white shadow"></div>
+                        <div class="flex-1 min-w-0">
+                            <div id="result-title" class="text-sm sm:text-base font-black leading-tight">—</div>
+                            <p id="result-remark" class="text-xs text-stone-700 leading-snug mt-0.5 line-clamp-2">—</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. 作答情況列 -->
+                    <div class="bang-card rounded-xl bg-[#fbf4e2] px-2.5 py-1.5 flex items-center justify-between gap-2 shrink-0">
+                        <span class="text-[11px] font-black text-[#5c1010] shrink-0">作答情況</span>
+                        <div id="result-emoji" class="flex items-center gap-1 overflow-hidden justify-center flex-1"></div>
+                        <div class="flex items-center gap-1.5 text-[10px] font-bold text-stone-700 shrink-0">
+                            <span class="flex items-center gap-0.5"><span class="inline-flex w-3.5 h-3.5 rounded-full bg-emerald-600 text-white items-center justify-center text-[9px]">✓</span>對</span>
+                            <span class="flex items-center gap-0.5"><span class="inline-flex w-3.5 h-3.5 rounded-full bg-red-600 text-white items-center justify-center text-[9px]">✗</span>錯</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. 晉級喜報 / 錯題或滿分榮譽欄 (填滿捲軸底部) -->
+                    <div class="flex flex-col gap-1.5 shrink-0">
+                        <div id="unlock-banner" class="hidden bg-gradient-to-r from-emerald-100 to-teal-100 border-2 border-emerald-500 text-emerald-900 text-xs font-black rounded-xl py-1.5 px-2 text-center shadow-sm"></div>
+                        <div id="wrong-box" class="bang-card rounded-xl bg-gradient-to-br from-[#fdf3f2] to-[#f8e1df] px-3 py-1.5 hidden">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-[#7c1919] border border-[#d4af37] text-[#f6dc82] flex items-center justify-center font-black text-sm shrink-0 shadow">錯</div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="text-xs font-black text-[#7c1919] leading-tight">硃筆圈選錯題</div>
+                                    <div id="wrong-list" class="text-[11px] text-stone-800 font-medium leading-snug max-h-[34px] overflow-hidden mt-0.5"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="perfect-box" class="hidden bang-card rounded-xl bg-gradient-to-r from-amber-100 via-yellow-50 to-amber-100 px-3 py-2 text-center">
+                            <div class="text-xs font-black text-[#7c1919]">👑 滿分無瑕・字正腔圓</div>
+                            <div class="text-[11px] text-amber-900 font-bold mt-0.5">一題未錯，堪為當朝正音楷模！快截圖留念！</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 底部金色捲軸軸桿 -->
+                <svg viewBox="0 0 360 16" class="w-full h-3.5 block drop-shadow -mt-1">
+                    <rect x="10" y="3" width="340" height="9" rx="4.5" fill="url(#rodGrad)" stroke="#450a0a" stroke-width="1.2"/>
+                    <rect x="0" y="1" width="16" height="13" rx="3" fill="url(#rodGrad)" stroke="#450a0a" stroke-width="1.2"/>
+                    <rect x="344" y="1" width="16" height="13" rx="3" fill="url(#rodGrad)" stroke="#450a0a" stroke-width="1.2"/>
+                </svg>
+            </div>
+
+            <!-- 底部操作按鈕 -->
+            <div class="w-full max-w-[378px] flex flex-col gap-1.5 shrink-0 z-10">
+                <button id="next-stage-btn" onclick="goToNextStage()" class="hidden btn-press w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white font-black py-2 px-4 rounded-xl shadow-lg border border-emerald-300 text-sm">
+                    ➡️ 奉旨晉級：挑戰下一關
+                </button>
+                <button id="revive-btn" onclick="watchAdToRevive()" class="btn-press w-full bg-gradient-to-b from-[#fce694] via-[#e5b94c] to-[#b9831a] text-red-950 font-black py-2 px-4 rounded-xl shadow-lg flex items-center justify-center gap-2 border border-amber-200 text-sm">
+                    <span class="w-5 h-5 rounded-full bg-[#450a0a] text-[#f6dc82] inline-flex items-center justify-center text-[10px]">▶</span>
+                    <span>看廣告滿血接關 (恢復三顆心繼續考)</span>
+                </button>
+                <button onclick="shareResult()" class="btn-press w-full bg-gradient-to-r from-[#b91c1c] via-[#d97706] to-[#b91c1c] text-[#fffbeb] font-black py-2 rounded-xl shadow-lg border-2 border-[#f6dc82] text-xs tracking-wider">
+                    ✨ 炫耀金榜・分享給好友挑戰
+                </button>
+                <div class="grid grid-cols-3 gap-2 w-full">
+                    <button onclick="saveCard()" class="btn-press bg-gradient-to-b from-[#991b1b] to-[#6b1414] border border-[#d4af37]/70 text-amber-100 font-bold py-2 rounded-xl shadow text-xs">📜 存榜單圖</button>
+                    <button onclick="backToMenu()" class="btn-press bg-gradient-to-b from-[#574942] to-[#362c27] border border-[#d4af37]/50 text-amber-100 font-bold py-2 rounded-xl shadow text-xs flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24"><path d="M2 10Q7 8 12 4Q17 8 22 10L20 11.5H4Z" fill="#f6dc82" stroke="#9a6b12" stroke-width=".7"/><path d="M5 13Q8.5 11.5 12 9.5Q15.5 11.5 19 13H5Z" fill="#d4af37"/><rect x="6" y="13" width="12" height="7" fill="#991b1b" stroke="#f6dc82" stroke-width=".7"/><rect x="10.5" y="15" width="3" height="5" fill="#450a0a"/><path d="M3 20H21V22H3Z" fill="#d4af37"/></svg><span>回殿前</span></button>
+                    <button onclick="restartGame()" class="btn-press bg-gradient-to-b from-[#047857] to-[#065f46] border border-emerald-300/60 text-white font-bold py-2 rounded-xl shadow text-xs">🔁 再應試</button>
+                </div>
+            </div>
+            <div id="copy-toast" class="fixed bottom-4 bg-emerald-600 text-white text-xs px-4 py-2 rounded-full opacity-0 transition-opacity duration-300 pointer-events-none z-50 shadow-lg">已複製！</div>
+        </div>
+
+        <!-- 預設瀏覽器開啟說明彈窗 -->
+        <div id="browser-modal" class="hidden absolute inset-0 z-50 bg-black/75 flex items-center justify-center p-5">
+            <div class="palace-paper border-4 border-[#d4af37] rounded-2xl p-4 max-w-xs w-full text-stone-900 shadow-2xl text-center">
+                <div class="text-lg font-black text-[#7c1919] mb-2">🌐 使用預設瀏覽器開啟</div>
+                <p class="text-xs text-stone-700 leading-relaxed mb-3">
+                    若您是從 <b>LINE</b>、<b>Threads (脆)</b> 或 <b>IG</b> 點開連結，點選廣告時容易在 App 內跳轉而回不來。<br><br>
+                    請點擊右上角（或右下角）<b>「⋯」</b>選單，選擇<b>「以預設瀏覽器開啟 / 在 Safari 或 Chrome 開啟」</b>！<br>
+                    （本遊戲亦有<b>自動存檔</b>，重開也能接續作答）
+                </p>
+                <div class="flex flex-col gap-2">
+                    <button onclick="tryLineExternalRedirect()" class="btn-press w-full bg-[#7c1919] text-[#f6dc82] font-bold py-2 rounded-xl text-xs border border-[#d4af37]">🚀 嘗試直接喚起外部瀏覽器</button>
+                    <button onclick="copyGameUrl()" class="btn-press w-full bg-amber-500 text-red-950 font-bold py-2 rounded-xl text-xs">📋 複製遊戲網址貼到瀏覽器</button>
+                    <button onclick="closeBrowserHelper()" class="btn-press w-full bg-stone-300 text-stone-800 font-bold py-1.5 rounded-xl text-xs">我知道了</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ----------------------------------------------------
+        // 1. 題庫設定
+        // ----------------------------------------------------
+        const RAW_BANK = `
+蛤蜊|ㄍㄜˊ ㄌㄧˊ|ㄏㄚˊ ㄌㄧˋ|ㄍㄜˊ ㄌㄧˋ|ㄏㄚˊ ㄌㄧˊ|「蛤蜊」標準音讀 ㄍㄜˊ ㄌㄧˊ，常被誤讀為 ㄏㄚˊ ㄌㄧˋ。
+骰子|ㄕㄞˇ ˙ㄗ|ㄊㄡˊ ˙ㄗ|ㄍㄨˇ ˙ㄗ|ㄕㄠˇ ˙ㄗ|「骰」作骰子解讀 ㄕㄞˇ（又音 ㄊㄡˊ），國語正音標準為 ㄕㄞˇ ˙ㄗ。
+龜裂|ㄐㄩㄣ ㄌㄧㄝˋ|ㄍㄨㄟ ㄌㄧㄝˋ|ㄍㄨㄟ ㄌㄧㄝ|ㄐㄩㄣ ㄌㄧㄝ|「龜」指皮膚或物體因乾燥而裂開時讀 ㄐㄩㄣ。
+秘魯|ㄅㄧˋ ㄌㄨˇ|ㄇㄧˋ ㄌㄨˇ|ㄇㄧˋ ㄌㄨ|ㄅㄧˋ ㄌㄨ|「秘」作南美洲國名「秘魯」時讀 ㄅㄧˋ。
+角色|ㄐㄩㄝˊ ㄙㄜˋ|ㄐㄧㄠˇ ㄙㄜˋ|ㄐㄩㄝˊ ㄕㄞˇ|ㄐㄧㄠˇ ㄕㄞˇ|「角」作戲劇人物解時讀 ㄐㄩㄝˊ，不讀 ㄐㄧㄠˇ。
+滑稽|ㄍㄨˇ ㄐㄧ|ㄏㄨㄚˊ ㄐㄧ|ㄏㄨㄚˊ ㄐㄧˊ|ㄍㄨˇ ㄐㄧˊ|「滑稽」傳統正音讀 ㄍㄨˇ ㄐㄧ（形容言語動作幽默風趣）。
+肉燥|ㄖㄡˋ ㄙㄠˋ|ㄖㄡˋ ㄗㄠˋ|ㄖㄡˋ ㄘㄠˋ|ㄖㄡˋ ㄕㄠˋ|「燥」指切碎的肉末（肉燥）時讀 ㄙㄠˋ。
+牛仔褲|ㄋㄧㄡˊ ㄗㄞˇ ㄎㄨˋ|ㄋㄧㄡˊ ㄗˇ ㄎㄨˋ|ㄋㄧㄡˊ ㄓㄞˇ ㄎㄨˋ|ㄋㄧㄡˊ ㄗㄞˋ ㄎㄨˋ|「仔」作「牛仔」解讀 ㄗㄞˇ（三聲）。
+法國|ㄈㄚˇ ㄍㄨㄛˊ|ㄈㄚˋ ㄍㄨㄛˊ|ㄈㄚ ㄍㄨㄛˊ|ㄈㄚˇ ㄍㄨㄛˇ|「法」在台灣標準音為 ㄈㄚˇ（三聲），不讀四聲。
+垃圾|ㄌㄜˋ ㄙㄜˋ|ㄌㄚ ㄐㄧ|ㄌㄚ ㄙㄜˋ|ㄌㄜˋ ㄐㄧ|台灣教育部標準音讀 ㄌㄜˋ ㄙㄜˋ。
+說服|ㄕㄨㄟˋ ㄈㄨˊ|ㄕㄨㄛ ㄈㄨˊ|ㄕㄨㄟˋ ㄈㄨˋ|ㄕㄨㄛ ㄈㄨˋ|「說」作勸說、使人信服解時讀 ㄕㄨㄟˋ。
+勉強|ㄇㄧㄢˇ ㄑㄧㄤˇ|ㄇㄧㄢˇ ㄑㄧㄤˊ|ㄇㄧㄢˇ ㄐㄧㄤˋ|ㄇㄧㄢˊ ㄑㄧㄤˇ|「強」作硬要、迫使解時讀 ㄑㄧㄤˇ（三聲）。
+檔案|ㄉㄤˇ ㄢˋ|ㄉㄤˋ ㄢˋ|ㄉㄤ ㄢˋ|ㄉㄤˋ ㄢ|台灣教育部標準音「檔」讀 ㄉㄤˇ（三聲），常被誤讀為四聲 ㄉㄤˋ。
+恫嚇|ㄉㄨㄥˋ ㄏㄜˋ|ㄊㄨㄥˊ ㄏㄜˋ|ㄉㄨㄥˋ ㄒㄧㄚˋ|ㄊㄨㄥˊ ㄒㄧㄚˋ|「恫」讀 ㄉㄨㄥˋ，「嚇」作恐嚇解讀 ㄏㄜˋ。
+酗酒|ㄒㄩˋ ㄐㄧㄡˇ|ㄒㄩㄥ ㄐㄧㄡˇ|ㄒㄩˋ ㄐㄧㄡˋ|ㄒㄩㄥˋ ㄐㄧㄡˇ|「酗」讀 ㄒㄩˋ（四聲），切勿看成「凶」而讀 ㄒㄩㄥ。
+校對|ㄐㄧㄠˋ ㄉㄨㄟˋ|ㄒㄧㄠˋ ㄉㄨㄟˋ|ㄐㄧㄠˇ ㄉㄨㄟˋ|ㄒㄧㄠˋ ㄉㄨㄟˇ|「校」作核對、考訂解讀 ㄐㄧㄠˋ；作學校解讀 ㄒㄧㄠˋ。
+瀑布|ㄆㄨˋ ㄅㄨˋ|ㄅㄠˋ ㄅㄨˋ|ㄆㄠˋ ㄅㄨˋ|ㄆㄨˊ ㄅㄨˋ|「瀑」讀 ㄆㄨˋ（四聲），常因「暴」偏旁誤讀為 ㄅㄠˋ。
+脈搏|ㄇㄛˋ ㄅㄛˊ|ㄇㄞˋ ㄅㄛˊ|ㄇㄛˋ ㄅㄛˋ|ㄇㄞˋ ㄅㄛˋ|「脈」在「脈搏、含情脈脈」讀 ㄇㄛˋ（又音 ㄇㄞˋ）。
+彆扭|ㄅㄧㄝˋ ㄋㄧㄡˇ|ㄅㄧㄝˊ ㄋㄧㄡˇ|ㄅㄧㄢˇ ㄋㄧㄡˇ|ㄅㄧㄝˋ ㄋㄧㄡˋ|「彆」讀 ㄅㄧㄝˋ（四聲），「彆扭」意為不順從、固執。
+氾濫|ㄈㄢˋ ㄌㄢˋ|ㄅㄢˋ ㄌㄢˋ|ㄈㄢˋ ㄌㄢˊ|ㄈㄢˊ ㄌㄢˋ|「氾」讀 ㄈㄢˋ，「濫」讀 ㄌㄢˋ。
+瑕疵|ㄒㄧㄚˊ ㄘ|ㄒㄧㄚˊ ㄗˇ|ㄒㄧㄚˊ ㄘˋ|ㄒㄧㄚˋ ㄘ|「疵」讀 ㄘ（一聲），常誤讀為二聲或三聲。
+氣餒|ㄑㄧˋ ㄋㄟˇ|ㄑㄧˋ ㄋㄞˇ|ㄑㄧˋ ㄋㄟˋ|ㄑㄧˋ ㄋㄧㄝˇ|「餒」讀 ㄋㄟˇ（三聲），意為喪失勇氣。
+蟑螂|ㄓㄤ ㄌㄤˊ|ㄓㄤ ㄌㄤ|ㄓㄤˋ ㄌㄤˊ|ㄓㄤ ㄌㄤˋ|「螂」讀 ㄌㄤˊ（二聲），注意聲調。
+披薩|ㄆㄧ ㄙㄚˋ|ㄆㄧ ㄙㄚ|ㄆㄧˊ ㄙㄚˋ|ㄆㄧˋ ㄙㄚˋ|「薩」讀 ㄙㄚˋ（四聲）。
+酵母|ㄒㄧㄠˋ ㄇㄨˇ|ㄐㄧㄠˋ ㄇㄨˇ|ㄒㄧㄠˋ ㄇㄨˋ|ㄐㄧㄠˋ ㄇㄨˋ|台灣教育部標準音「酵」讀 ㄒㄧㄠˋ（發酵、酵母皆同）。
+鷹架|ㄧㄥ ㄐㄧㄚˋ|ㄧㄥˇ ㄐㄧㄚˋ|ㄧㄥ ㄐㄧㄚ|ㄧㄥˋ ㄐㄧㄚˋ|「鷹」讀 ㄧㄥ（一聲）。
+危險|ㄨㄟˊ ㄒㄧㄢˇ|ㄨㄟ ㄒㄧㄢˇ|ㄨㄟ ㄒㄧㄢˋ|ㄨㄟˊ ㄒㄧㄢˋ|台灣教育部標準音「危」讀 ㄨㄟˊ（二聲），常被口語誤讀為一聲 ㄨㄟ。
+括弧|ㄎㄨㄛˋ ㄏㄨˊ|ㄍㄨㄚ ㄏㄨˊ|ㄎㄨㄛˋ ㄍㄨㄥ|ㄍㄨㄚ ㄍㄨㄥ|「括」讀 ㄎㄨㄛˋ（四聲），不讀 ㄍㄨㄚ。
+糟糕|ㄗㄠ ㄍㄠ|ㄗㄠˋ ㄍㄠ|ㄗㄠ ㄍㄠˇ|ㄗㄠˋ ㄍㄠˇ|「糟」與「糕」皆為一聲。
+惡劣|ㄜˋ ㄌㄧㄝˋ|ㄜˇ ㄌㄧㄝˋ|ㄜˋ ㄌㄨㄛˋ|ㄜˋ ㄌㄧㄝ|「惡」作不好解讀 ㄜˋ；作討厭解（厭惡）讀 ㄨˋ；作想吐解讀 ㄜˇ。
+嘮叨|ㄌㄠˊ ㄉㄠ|ㄌㄠˋ ㄉㄠ|ㄌㄠˊ ㄊㄠ|ㄌㄠˋ ㄊㄠ|「嘮」讀 ㄌㄠˊ（二聲），指不停地說話。
+供給|ㄍㄨㄥ ㄐㄧˇ|ㄍㄨㄥ ㄍㄟˇ|ㄍㄨㄥˋ ㄐㄧˇ|ㄍㄨㄥˋ ㄍㄟˇ|「給」作供應、充足解讀 ㄐㄧˇ（如供給、自給自足）。
+氛圍|ㄈㄣ ㄨㄟˊ|ㄈㄣˋ ㄨㄟˊ|ㄈㄣ ㄩㄢˊ|ㄈㄣˋ ㄩㄢˊ|「氛」讀 ㄈㄣ（一聲），「圍」讀 ㄨㄟˊ（二聲）。
+簽證|ㄑㄧㄢ ㄓㄥˋ|ㄑㄧㄢˇ ㄓㄥˋ|ㄑㄧㄢ ㄓㄥ|ㄒㄧㄢ ㄓㄥˋ|「簽」讀 ㄑㄧㄢ（一聲）。
+分泌|ㄈㄣ ㄇㄧˋ|ㄈㄣ ㄅㄧˋ|ㄈㄣˋ ㄇㄧˋ|ㄈㄣˋ ㄅㄧˋ|「泌」作分泌解讀 ㄇㄧˋ；僅古地名「泌陽」讀 ㄅㄧˋ。
+引擎|ㄧㄣˇ ㄑㄧㄥˊ|ㄧㄣˇ ㄐㄧㄥˊ|ㄧㄣ ㄑㄧㄥˊ|ㄧㄥˇ ㄑㄧㄥˊ|「擎」讀 ㄑㄧㄥˊ（二聲），切勿誤讀為 ㄐㄧㄥˊ。
+緋聞|ㄈㄟ ㄨㄣˊ|ㄈㄟˇ ㄨㄣˊ|ㄈㄟˋ ㄨㄣˊ|ㄆㄟˊ ㄨㄣˊ|「緋」讀 ㄈㄟ（一聲），原指紅色，後借指桃色新聞。
+挑釁|ㄊㄧㄠˇ ㄒㄧㄣˋ|ㄊㄧㄠ ㄒㄧㄣˋ|ㄊㄧㄠˇ ㄆㄢˋ|ㄊㄧㄠˋ ㄒㄧㄣˋ|「挑」作惹起爭端解讀 ㄊㄧㄠˇ（三聲），「釁」讀 ㄒㄧㄣˋ。
+抨擊|ㄆㄥ ㄐㄧˊ|ㄆㄧㄥˊ ㄐㄧˊ|ㄆㄥˊ ㄐㄧˊ|ㄆㄧㄥ ㄐㄧˊ|「抨」讀 ㄆㄥ（一聲），意為彈劾、攻擊。
+媲美|ㄆㄧˋ ㄇㄟˇ|ㄅㄧˋ ㄇㄟˇ|ㄆㄧ ㄇㄟˇ|ㄆㄧˇ ㄇㄟˇ|「媲」讀 ㄆㄧˋ（四聲），意為比得上、相匹敵。
+卓越|ㄓㄨㄛˊ ㄩㄝˋ|ㄓㄨㄛ ㄩㄝˋ|ㄓㄠ ㄩㄝˋ|ㄓㄨㄛˋ ㄩㄝˋ|「卓」讀 ㄓㄨㄛˊ（二聲），不讀一聲。
+按捺|ㄢˋ ㄋㄚˋ|ㄢˋ ㄋㄞˋ|ㄢˋ ㄋㄚˇ|ㄢ ㄋㄚˋ|「捺」讀 ㄋㄚˋ，意為抑制、忍耐。
+押韻|ㄧㄚ ㄩㄣˋ|ㄧㄚˋ ㄩㄣˋ|ㄧㄚˊ ㄩㄣˋ|ㄧㄚˇ ㄩㄣˋ|「押」讀 ㄧㄚ（一聲），不讀四聲。
+解剖|ㄐㄧㄝˇ ㄆㄡˇ|ㄐㄧㄝˇ ㄆㄛˇ|ㄐㄧㄝˇ ㄆㄡˋ|ㄐㄧㄝˋ ㄆㄡˇ|「剖」讀 ㄆㄡˇ（三聲），常誤讀為 ㄆㄛˇ。
+哺育|ㄅㄨˇ ㄩˋ|ㄆㄨˇ ㄩˋ|ㄈㄨˇ ㄩˋ|ㄅㄨˋ ㄩˋ|「哺」讀 ㄅㄨˇ（三聲），意為餵養。
+提防|ㄉㄧ ㄈㄤˊ|ㄊㄧˊ ㄈㄤˊ|ㄉㄧˋ ㄈㄤˊ|ㄊㄧ ㄈㄤˊ|「提」作小心戒備解時讀 ㄉㄧ（一聲）。
+殷紅|ㄧㄢ ㄏㄨㄥˊ|ㄧㄣ ㄏㄨㄥˊ|ㄧㄣˇ ㄏㄨㄥˊ|ㄧㄢˋ ㄏㄨㄥˊ|「殷」指黑紅色時讀 ㄧㄢ（一聲）。
+星宿|ㄒㄧㄥ ㄒㄧㄡˋ|ㄒㄧㄥ ㄙㄨˋ|ㄒㄧㄥ ㄒㄧㄡ|ㄒㄧㄥ ㄙㄨˇ|「宿」指星辰、星座時讀 ㄒㄧㄡˋ（四聲）。
+泥淖|ㄋㄧˊ ㄋㄠˋ|ㄋㄧˊ ㄓㄨㄛˊ|ㄋㄧˊ ㄉㄠˋ|ㄋㄧˊ ㄋㄧㄠˇ|「淖」讀 ㄋㄠˋ（四聲），指爛泥。
+胚胎|ㄆㄟ ㄊㄞ|ㄆㄧ ㄊㄞ|ㄆㄟˊ ㄊㄞ|ㄆㄟˇ ㄊㄞ|「胚」讀 ㄆㄟ（一聲），不讀 ㄆㄧ。
+友誼|ㄧㄡˇ ㄧˋ|ㄧㄡˇ ㄧˊ|ㄧㄡˊ ㄧˋ|ㄧㄡˋ ㄧˋ|台灣教育部標準音「誼」讀 ㄧˋ（四聲）。
+企鵝|ㄑㄧˋ ㄜˊ|ㄑㄧˇ ㄜˊ|ㄑㄧ ㄜˊ|ㄐㄧˋ ㄜˊ|「企」讀 ㄑㄧˋ（四聲），常誤讀為三聲。
+包括|ㄅㄠ ㄎㄨㄛˋ|ㄅㄠ ㄍㄨㄚ|ㄅㄠ ㄎㄨㄛ|ㄅㄠ ㄍㄨㄚˋ|「括」讀 ㄎㄨㄛˋ（四聲），不讀 ㄍㄨㄚ。
+脊椎|ㄐㄧˇ ㄓㄨㄟ|ㄐㄧˊ ㄓㄨㄟ|ㄐㄧ ㄓㄨㄟ|ㄐㄧˋ ㄓㄨㄟ|「脊」讀 ㄐㄧˇ（三聲），常誤讀為二聲。
+創傷|ㄔㄨㄤ ㄕㄤ|ㄔㄨㄤˋ ㄕㄤ|ㄔㄨㄤˊ ㄕㄤ|ㄔㄨㄤˇ ㄕㄤ|「創」指傷口、受傷時讀 ㄔㄨㄤ（一聲）；創造讀 ㄔㄨㄤˋ。
+提供|ㄊㄧˊ ㄍㄨㄥ|ㄊㄧˊ ㄍㄨㄥˋ|ㄉㄧ ㄍㄨㄥ|ㄊㄧ ㄍㄨㄥ|「供」作供給解讀 ㄍㄨㄥ（一聲）；供品、口供讀 ㄍㄨㄥˋ。
+高麗菜|ㄍㄠ ㄌㄧˊ ㄘㄞˋ|ㄍㄠ ㄌㄧˋ ㄘㄞˋ|ㄍㄠ ㄌㄧ ㄘㄞˋ|ㄍㄠˋ ㄌㄧˊ ㄘㄞˋ|「麗」作古國名「高麗」解時讀 ㄌㄧˊ（二聲）。
+處女座|ㄔㄨˇ ㄋㄩˇ ㄗㄨㄛˋ|ㄔㄨˋ ㄋㄩˇ ㄗㄨㄛˋ|ㄔㄨ ㄋㄩˇ ㄗㄨㄛˋ|ㄔㄨˇ ㄋㄩˋ ㄗㄨㄛˋ|「處」作未出嫁、居留解時讀 ㄔㄨˇ（三聲）。
+載重|ㄗㄞˋ ㄓㄨㄥˋ|ㄗㄞˇ ㄓㄨㄥˋ|ㄗㄞ ㄓㄨㄥˋ|ㄗㄞˋ ㄓㄨㄥ|「載」作裝運解讀 ㄗㄞˋ（四聲）；「記載、一年半載」讀 ㄗㄞˇ。
+潛力|ㄑㄧㄢˊ ㄌㄧˋ|ㄑㄧㄢˇ ㄌㄧˋ|ㄑㄧㄢ ㄌㄧˋ|ㄐㄧㄢˇ ㄌㄧˋ|「潛」讀 ㄑㄧㄢˊ（二聲），不讀三聲。
+剽竊|ㄆㄧㄠˋ ㄑㄧㄝˋ|ㄆㄧㄠ ㄑㄧㄝˋ|ㄅㄧㄠ ㄑㄧㄝˋ|ㄆㄧㄠˇ ㄑㄧㄝˋ|「剽」讀 ㄆㄧㄠˋ（四聲），意為抄襲他人作品。
+龜甲|ㄍㄨㄟ ㄐㄧㄚˇ|ㄐㄩㄣ ㄐㄧㄚˇ|ㄑㄧㄡ ㄐㄧㄚˇ|ㄍㄨㄟˇ ㄐㄧㄚˇ|「龜」指烏龜讀 ㄍㄨㄟ；「龜裂」讀 ㄐㄩㄣ；「龜茲」讀 ㄑㄧㄡ。
+倔強|ㄐㄩㄝˊ ㄐㄧㄤˋ|ㄐㄩㄝˊ ㄑㄧㄤˊ|ㄐㄩㄝ ㄐㄧㄤˋ|ㄑㄩ ㄐㄧㄤˋ|「倔」讀 ㄐㄩㄝˊ，「強」作固執解讀 ㄐㄧㄤˋ。
+粗糙|ㄘㄨ ㄘㄠ|ㄘㄨ ㄗㄠˋ|ㄘㄨ ㄘㄠˋ|ㄗㄨ ㄘㄠ|「糙」讀 ㄘㄠ（一聲），常誤讀為 ㄗㄠˋ。
+徘徊|ㄆㄞˊ ㄏㄨㄞˊ|ㄆㄟˊ ㄏㄨㄟˊ|ㄈㄟ ㄏㄨㄞˊ|ㄆㄞˊ ㄏㄨㄟˊ|「徘徊」讀 ㄆㄞˊ ㄏㄨㄞˊ，不讀 ㄆㄟˊ ㄏㄨㄟˊ。
+嶄新|ㄓㄢˇ ㄒㄧㄣ|ㄗㄢˇ ㄒㄧㄣ|ㄐㄧㄢˇ ㄒㄧㄣ|ㄓㄢˋ ㄒㄧㄣ|「嶄」讀 ㄓㄢˇ（捲舌音），不讀 ㄗㄢˇ。
+挫折|ㄘㄨㄛˋ ㄓㄜˊ|ㄘㄨㄛ ㄓㄜˊ|ㄗㄨㄛˋ ㄓㄜˊ|ㄘㄨㄛˋ ㄕㄜˊ|「挫」讀 ㄘㄨㄛˋ（四聲），不讀一聲。
+包庇|ㄅㄠ ㄅㄧˋ|ㄅㄠ ㄆㄧˋ|ㄅㄠ ㄆㄧ|ㄅㄠ ㄅㄧˇ|「庇」讀 ㄅㄧˋ（四聲），意為袒護。
+逮捕|ㄉㄞˋ ㄅㄨˇ|ㄉㄞˇ ㄅㄨˇ|ㄉㄞ ㄅㄨˇ|ㄉㄞˋ ㄆㄨˇ|「逮」作逮捕解讀 ㄉㄞˋ（四聲）；口語「逮到」讀 ㄉㄞˇ。
+懺悔|ㄔㄢˋ ㄏㄨㄟˇ|ㄑㄧㄢ ㄏㄨㄟˇ|ㄘㄢˋ ㄏㄨㄟˇ|ㄔㄢ ㄏㄨㄟˇ|「懺」讀 ㄔㄢˋ（四聲），不讀 ㄑㄧㄢ。
+澎湃|ㄆㄥˊ ㄆㄞˋ|ㄆㄥ ㄆㄞˋ|ㄆㄥˊ ㄅㄞˋ|ㄆㄥ ㄅㄞˋ|「澎湃」台灣教育部標準音讀 ㄆㄥˊ ㄆㄞˋ。
+剽悍|ㄆㄧㄠˋ ㄏㄢˋ|ㄆㄧㄠ ㄏㄢˋ|ㄅㄧㄠ ㄏㄢˋ|ㄆㄧㄠˇ ㄏㄢˋ|「剽」讀 ㄆㄧㄠˋ（四聲），意為勇猛敏捷。
+嫉妒|ㄐㄧˊ ㄉㄨˋ|ㄐㄧˋ ㄉㄨˋ|ㄐㄧ ㄉㄨˋ|ㄓˊ ㄉㄨˋ|「嫉」讀 ㄐㄧˊ（二聲），常誤讀為四聲。
+精湛|ㄐㄧㄥ ㄓㄢˋ|ㄐㄧㄥ ㄕㄣˋ|ㄐㄧㄥ ㄗㄢˋ|ㄐㄧㄥˋ ㄓㄢˋ|「湛」讀 ㄓㄢˋ（四聲），意為精深。
+造詣|ㄗㄠˋ ㄧˋ|ㄗㄠˋ ㄓˇ|ㄗㄠˋ ㄓˋ|ㄗㄠ ㄧˋ|「詣」讀 ㄧˋ（四聲），指學業或技藝所達的境界。
+謄寫|ㄊㄥˊ ㄒㄧㄝˇ|ㄊㄥ ㄒㄧㄝˇ|ㄩˋ ㄒㄧㄝˇ|ㄉㄥ ㄒㄧㄝˇ|「謄」讀 ㄊㄥˊ（二聲），意為照底稿抄寫。
+闡述|ㄔㄢˇ ㄕㄨˋ|ㄕㄢˋ ㄕㄨˋ|ㄔㄢˋ ㄕㄨˋ|ㄉㄢ ㄕㄨˋ|「闡」讀 ㄔㄢˇ（三聲），意為說明、發揮。
+桎梏|ㄓˋ ㄍㄨˋ|ㄓˋ ㄍㄠˋ|ㄓ ㄍㄨˋ|ㄓˋ ㄎㄨˋ|「梏」讀 ㄍㄨˋ（四聲），原指手銬腳鐐，比喻束縛。
+吮吸|ㄕㄨㄣˇ ㄒㄧ|ㄩㄣˇ ㄒㄧ|ㄕㄨㄣˋ ㄒㄧ|ㄔㄨㄣˇ ㄒㄧ|「吮」讀 ㄕㄨㄣˇ（三聲），常誤讀為 ㄩㄣˇ。
+畸形|ㄐㄧ ㄒㄧㄥˊ|ㄑㄧˊ ㄒㄧㄥˊ|ㄐㄧˇ ㄒㄧㄥˊ|ㄑㄧ ㄒㄧㄥˊ|「畸」讀 ㄐㄧ（一聲），不讀 ㄑㄧˊ。
+角逐|ㄐㄩㄝˊ ㄓㄨˊ|ㄐㄧㄠˇ ㄓㄨˊ|ㄐㄩㄝˊ ㄓㄨㄛˊ|ㄐㄧㄠˇ ㄓㄨㄛˊ|「角」作競爭解讀 ㄐㄩㄝˊ（二聲）。
+庇護|ㄅㄧˋ ㄏㄨˋ|ㄆㄧˋ ㄏㄨˋ|ㄅㄧˇ ㄏㄨˋ|ㄆㄧ ㄏㄨˋ|「庇」讀 ㄅㄧˋ（四聲），意為保護、袒護。
+傀儡|ㄎㄨㄟˇ ㄌㄟˇ|ㄍㄨㄟ ㄌㄟˇ|ㄎㄨㄟ ㄌㄟˇ|ㄎㄨㄟˋ ㄌㄟˇ|「傀」作木偶解讀 ㄎㄨㄟˇ（三聲）。
+嶄露|ㄓㄢˇ ㄌㄨˋ|ㄗㄢˇ ㄌㄨˋ|ㄓㄢˇ ㄌㄡˋ|ㄐㄧㄢˇ ㄌㄨˋ|「露」作顯現解讀 ㄌㄨˋ（四聲）。
+滂沱|ㄆㄤ ㄊㄨㄛˊ|ㄆㄤˊ ㄊㄨㄛˊ|ㄆㄤˋ ㄊㄨㄛˊ|ㄈㄤ ㄊㄨㄛˊ|「滂」讀 ㄆㄤ（一聲），形容大雨傾盆。
+狙擊|ㄐㄩ ㄐㄧˊ|ㄗㄨˇ ㄐㄧˊ|ㄐㄩˇ ㄐㄧˊ|ㄐㄩˋ ㄐㄧˊ|「狙」讀 ㄐㄩ（一聲），常誤讀為 ㄗㄨˇ。
+熾熱|ㄔˋ ㄖㄜˋ|ㄓˋ ㄖㄜˋ|ㄔ ㄖㄜˋ|ㄓ ㄖㄜˋ|「熾」讀 ㄔˋ（四聲），意為火旺、極熱。
+瞠目|ㄔㄥ ㄇㄨˋ|ㄊㄤˊ ㄇㄨˋ|ㄔㄥˊ ㄇㄨˋ|ㄉㄤ ㄇㄨˋ|「瞠」讀 ㄔㄥ（一聲），意為瞪大眼睛直視。
+憧憬|ㄔㄨㄥ ㄐㄧㄥˇ|ㄊㄨㄥˊ ㄐㄧㄥˇ|ㄔㄨㄥˋ ㄐㄧㄥˇ|ㄓㄨㄤˋ ㄐㄧㄥˇ|「憧」讀 ㄔㄨㄥ（一聲），意為心意嚮往。
+驀然|ㄇㄛˋ ㄖㄢˊ|ㄇㄨˋ ㄖㄢˊ|ㄇㄚˋ ㄖㄢˊ|ㄇㄛ ㄖㄢˊ|「驀」讀 ㄇㄛˋ（四聲），意為突然、猛然。
+`;
+
+        const RARE_BANK = `
+爨|ㄘㄨㄢˋ|ㄘㄨㄣˋ|ㄘㄨㄢˊ|ㄘㄨㄥˋ|燒火做飯、爐灶。30 畫，常被票選為最難寫的常用字之一。
+麤|ㄘㄨ|ㄌㄨˋ|ㄘㄨˊ|ㄘㄨˇ|「粗」的異體字，三隻鹿，本指鹿群奔跑，引申為粗糙、粗魯。
+猋|ㄅㄧㄠ|ㄑㄩㄢˇ|ㄅㄧㄠˇ|ㄑㄩㄝˋ|三隻犬，指群犬奔跑，或疾風的樣子。
+犇|ㄅㄣ|ㄋㄧㄡˊ|ㄆㄣ|ㄅㄥ|三頭牛，與「奔」同義，指群牛奔跑或急走。
+羴|ㄕㄢ|ㄧㄤˊ|ㄕㄢˊ|ㄒㄧㄢ|三隻羊，與「膻」同義，指羊群或羊肉的氣味。
+鱻|ㄒㄧㄢ|ㄩˊ|ㄒㄩㄢ|ㄒㄧㄢˊ|三條魚，與「鮮」同義。
+垚|ㄧㄠˊ|ㄊㄨˇ|ㄧㄠˋ|ㄕㄢ|三個土堆疊，形容山高的樣子。
+瞐|ㄇㄛˋ|ㄇㄨˋ|ㄇㄛˊ|ㄇㄚˋ|三隻目，形容眼睛美麗，或看人的樣子。
+孨|ㄓㄨㄢˇ|ㄗˇ|ㄓㄨㄛˇ|ㄗㄨㄢˇ|三個子，意指謹慎小心，或孤兒。
+掱|ㄆㄚˊ|ㄕㄡˇ|ㄆㄚˋ|ㄅㄚˊ|三隻手，意指扒手、小偷。
+惢|ㄙㄨㄛˇ|ㄒㄧㄣ|ㄙㄨㄛˋ|ㄙㄨㄥˇ|三個心，意同「蕊」，或心意煩亂。此字也可讀 ㄖㄨㄟˇ。
+驫|ㄅㄧㄠ|ㄇㄚˇ|ㄅㄧㄠˋ|ㄅㄥ|三匹馬，形容眾馬奔騰。
+焱|ㄧㄢˋ|ㄏㄨㄛˇ|ㄧㄢˊ|ㄧㄢ|三把火，指火花、火焰。
+毳|ㄘㄨㄟˋ|ㄇㄠˊ|ㄘㄨㄟ|ㄘㄨㄟˊ|三根毛，指鳥獸的細毛。
+淼|ㄇㄧㄠˇ|ㄕㄨㄟˇ|ㄇㄧㄠˋ|ㄇㄧㄠˊ|三個水，形容水勢遼闊。
+靐|ㄅㄧㄥˋ|ㄌㄟˊ|ㄅㄥ|ㄆㄧㄥˋ|三個雷疊在一起，指雷聲。共有 39 畫。
+飍|ㄒㄧㄡ|ㄈㄥ|ㄅㄧㄠ|ㄏㄨ|三陣風疊在一起，指驚跑的樣子。
+馫|ㄒㄧㄣ|ㄒㄧㄤ|ㄒㄧㄥ|ㄒㄧㄣˋ|三個香疊在一起，與「馨」同義，指香氣濃厚。
+灥|ㄑㄩㄢˊ|ㄕㄨㄟˇ|ㄒㄩㄣˊ|ㄩㄢˊ|三個泉疊在一起，指眾多泉水匯流。
+茻|ㄇㄤˇ|ㄘㄠˇ|ㄏㄨㄟˋ|ㄇㄠˇ|四個「屮」草木叢生，指眾草，也是「莽」的古字。
+饕|ㄊㄠ|ㄏㄠˋ|ㄊㄠˊ|ㄉㄠ|「饕餮」之一，貪食、貪財的意思。
+餮|ㄊㄧㄝˋ|ㄊㄧㄝ|ㄊㄧㄢˇ|ㄉㄧㄝˊ|「饕餮」之一，傳說中貪食的惡獸。
+耄|ㄇㄠˋ|ㄌㄠˇ|ㄇㄠˊ|ㄏㄠˋ|指八、九十歲的年紀，如「耄耋之年」。
+耋|ㄉㄧㄝˊ|ㄓˋ|ㄉㄧㄝˋ|ㄊㄧㄝˊ|指七、八十歲的年紀，如「耄耋之年」。
+齉|ㄋㄤˋ|ㄅㄧˊ|ㄋㄤˊ|ㄋㄤˇ|指鼻子不通而發音不清（齉鼻）。共有 36 畫。
+`;
+
+        const IDIOM_RAW = `
+一丘之貉|3|ㄏㄜˊ|ㄌㄨㄛˋ|ㄍㄜˊ|ㄇㄛˋ|「貉」讀 ㄏㄜˊ，比喻彼此同類、一樣壞。
+大腹便便|2|ㄆㄧㄢˊ|ㄅㄧㄢˋ|ㄆㄧㄢˋ|ㄅㄧㄢˇ|「便便」在此讀 ㄆㄧㄢˊ ㄆㄧㄢˊ，形容肚子肥大的樣子。
+剛愎自用|1|ㄅㄧˋ|ㄈㄨˋ|ㄈㄨˊ|ㄅㄧˇ|「愎」讀 ㄅㄧˋ，指性情固執、自以為是。
+垂涎三尺|1|ㄒㄧㄢˊ|ㄧㄢˊ|ㄉㄢˋ|ㄧㄢˇ|「涎」讀 ㄒㄧㄢˊ，指口水，常誤讀為 ㄧㄢˊ。
+同仇敵愾|3|ㄎㄞˋ|ㄑㄧˋ|ㄒㄧˋ|ㄍㄞˋ|「愾」讀 ㄎㄞˋ，指憤恨，形容全體一致痛恨敵人。
+膾炙人口|0|ㄎㄨㄞˋ|ㄏㄨㄟˋ|ㄍㄨㄟˋ|ㄎㄨㄟˋ|「膾」讀 ㄎㄨㄞˋ，原指細切的肉，比喻詩文人人稱讚。
+一蹶不振|1|ㄐㄩㄝˊ|ㄐㄩㄝˇ|ㄑㄩㄝˋ|ㄍㄨㄟˋ|「蹶」讀 ㄐㄩㄝˊ，指跌倒，比喻遭受挫折後無法再振作。
+趨之若鶩|3|ㄨˋ|ㄇㄠˋ|ㄇㄨˋ|ㄨˇ|「鶩」讀 ㄨˋ，原指鴨子，比喻許多人爭相追逐。
+一蹴可幾|1|ㄘㄨˋ|ㄐㄧㄡˋ|ㄗㄨˊ|ㄘㄨㄛˋ|「蹴」讀 ㄘㄨˋ，指踏、踢，比喻事情輕易就能成功。
+既往不咎|3|ㄐㄧㄡˋ|ㄐㄧㄡˇ|ㄍㄠ|ㄐㄧㄡ|「咎」讀 ㄐㄧㄡˋ，指追究罪過。
+莘莘學子|0|ㄕㄣ|ㄒㄧㄣ|ㄒㄧㄥ|ㄕㄥ|「莘」在此讀 ㄕㄣ，形容眾多的樣子。
+面面相覷|3|ㄑㄩˋ|ㄒㄩ|ㄑㄩˇ|ㄐㄩˋ|「覷」讀 ㄑㄩˋ，指張眼互相注視。
+草菅人命|1|ㄐㄧㄢ|ㄍㄨㄢˇ|ㄍㄨㄢ|ㄐㄧㄢˇ|「菅」讀 ㄐㄧㄢ，原指茅草，比喻任意殘殺人民。
+未雨綢繆|3|ㄇㄡˊ|ㄇㄧㄡˋ|ㄌㄧㄠˊ|ㄇㄧㄠˇ|「繆」在此讀 ㄇㄡˊ，比喻事先做好防範準備。
+毛骨悚然|2|ㄙㄨㄥˇ|ㄕㄨˋ|ㄙㄨㄥˋ|ㄙㄨㄥ|「悚」讀 ㄙㄨㄥˇ，形容極為恐懼、驚駭。
+良莠不齊|1|ㄧㄡˇ|ㄒㄧㄡˋ|ㄧㄡˋ|ㄒㄧㄡ|「莠」讀 ㄧㄡˇ，原指雜草，比喻好人與壞人混雜在一起。
+苦心孤詣|3|ㄧˋ|ㄓˇ|ㄓˋ|ㄧˇ|「詣」讀 ㄧˋ，指學問或技藝達到別人不及的境界。
+摩肩擦踵|3|ㄓㄨㄥˇ|ㄓㄨㄥˋ|ㄔㄨㄥˊ|ㄊㄨㄥˇ|「踵」讀 ㄓㄨㄥˇ，指腳後跟，形容人潮極為擁擠。
+如法炮製|2|ㄆㄠˊ|ㄆㄠˋ|ㄅㄠ|ㄆㄠ|「炮」在此讀 ㄆㄠˊ，原指中藥炮製方法，後指照樣辦理。
+相形見絀|3|ㄔㄨˋ|ㄓㄨㄛˊ|ㄔㄨ|ㄓㄨˋ|「絀」讀 ㄔㄨˋ，指不足，比喻兩相比較下顯得遜色。
+飲鴆止渴|1|ㄓㄣˋ|ㄐㄧㄡ|ㄓㄣ|ㄔㄣˊ|「鴆」讀 ㄓㄣˋ，原指毒酒，比喻只顧解決眼前困難而不顧後患。
+暴殄天物|1|ㄊㄧㄢˇ|ㄓㄣˇ|ㄊㄧㄢˊ|ㄓㄣˋ|「殄」讀 ㄊㄧㄢˇ，指滅絕、浪費自然萬物。
+自怨自艾|3|ㄧˋ|ㄞˋ|ㄧˇ|ㄞˊ|「艾」在此讀 ㄧˋ，指懲治、改正自己的過失。
+高屋建瓴|3|ㄌㄧㄥˊ|ㄌㄧㄥˇ|ㄌㄧㄥˋ|ㄐㄧㄣ|「瓴」讀 ㄌㄧㄥˊ，指盛水的瓶子，比喻居高臨下、形勢有利。
+越俎代庖|3|ㄆㄠˊ|ㄅㄠ|ㄆㄠˋ|ㄆㄠˇ|「庖」讀 ㄆㄠˊ，指廚師，比喻超越職權去替人做事。
+破釜沉舟|1|ㄈㄨˇ|ㄈㄨˋ|ㄐㄧㄣ|ㄈㄨ|「釜」讀 ㄈㄨˇ，指古代煮飯的鍋子。
+病入膏肓|3|ㄏㄨㄤ|ㄇㄤˊ|ㄨㄤˊ|ㄏㄨㄤˇ|「肓」讀 ㄏㄨㄤ，指心尖下方的部位，比喻病重無法醫治。
+捉襟見肘|3|ㄓㄡˇ|ㄘㄨㄣˋ|ㄓㄡˋ|ㄗㄡˇ|「肘」讀 ㄓㄡˇ，指手肘，比喻窮困窘迫。
+居心叵測|2|ㄆㄛˇ|ㄐㄩˋ|ㄆㄛˋ|ㄎㄜˇ|「叵」讀 ㄆㄛˇ，意為不可，指心懷不軌。
+鬼鬼祟祟|2|ㄙㄨㄟˋ|ㄔㄨㄥˊ|ㄙㄨㄟˇ|ㄘㄨㄟˋ|「祟」讀 ㄙㄨㄟˋ，常誤看成「崇」而讀 ㄔㄨㄥˊ。
+虎視眈眈|2|ㄉㄢ|ㄕㄣˇ|ㄉㄢˇ|ㄔㄣˊ|「眈」讀 ㄉㄢ（一聲），指貪婪地注視。
+咎由自取|0|ㄐㄧㄡˋ|ㄐㄧㄡˇ|ㄍㄠ|ㄐㄧㄡ|「咎」讀 ㄐㄧㄡˋ，指罪過、過失。
+前仆後繼|1|ㄆㄨ|ㄈㄨˋ|ㄆㄨˊ|ㄆㄨˇ|「仆」作向前跌倒解讀 ㄆㄨ（一聲）。
+炙手可熱|0|ㄓˋ|ㄐㄧㄡˇ|ㄓ|ㄔˋ|「炙」讀 ㄓˋ（四聲），原指烤肉。
+相濡以沫|1|ㄖㄨˊ|ㄖㄨˇ|ㄋㄨㄛˋ|ㄒㄩ|「濡」讀 ㄖㄨˊ（二聲），指沾濕。
+罄竹難書|0|ㄑㄧㄥˋ|ㄆㄢˊ|ㄑㄧㄥ|ㄐㄧㄥˋ|「罄」讀 ㄑㄧㄥˋ，指用盡竹簡也寫不完罪行。
+汗流浹背|2|ㄐㄧㄚˊ|ㄒㄧㄚˊ|ㄐㄧㄚ|ㄒㄧㄝˊ|「浹」讀 ㄐㄧㄚˊ（二聲），形容汗水濕透背脊。
+瞠目結舌|0|ㄔㄥ|ㄊㄤˊ|ㄉㄥˋ|ㄔㄥˊ|「瞠」讀 ㄔㄥ（一聲），形容驚愕得瞪大眼睛說不出話。
+咄咄逼人|0|ㄉㄨㄛˋ|ㄓㄨㄛˊ|ㄔㄨˋ|ㄉㄨㄛ|「咄」讀 ㄉㄨㄛˋ（四聲），形容氣勢盛人、使人難堪。
+不屈不撓|3|ㄋㄠˊ|ㄖㄠˊ|ㄧㄠˊ|ㄋㄠˇ|「撓」讀 ㄋㄠˊ（二聲），指屈服、退縮。
+怙惡不悛|3|ㄑㄩㄢ|ㄐㄩㄣˋ|ㄙㄨㄣ|ㄗㄨㄣ|「悛」讀 ㄑㄩㄢ（一聲），指改過。
+言簡意賅|3|ㄍㄞ|ㄏㄞˋ|ㄎㄞˇ|ㄍㄞˇ|「賅」讀 ㄍㄞ（一聲），指完備、概括。
+好逸惡勞|2|ㄨˋ|ㄜˋ|ㄜˇ|ㄨˇ|「惡」在此作動詞厭惡解，讀 ㄨˋ（四聲）。
+載歌載舞|0|ㄗㄞˋ|ㄗㄞˇ|ㄗㄞ|ㄘㄞˊ|「載」作且、又解讀 ㄗㄞˋ（四聲）。
+模稜兩可|1|ㄌㄥˊ|ㄌㄧㄥˊ|ㄌㄥˋ|ㄌㄧㄥˇ|「稜」讀 ㄌㄥˊ（二聲），指態度含糊不明確。
+趨炎附勢|0|ㄑㄩ|ㄑㄩˇ|ㄘㄨˋ|ㄑㄩˋ|「趨」讀 ㄑㄩ（一聲），指依附權貴。
+虛與委蛇|3|ㄧˊ|ㄕㄜˊ|ㄨㄟˇ|ㄧˇ|「委蛇」在此讀 ㄨㄟ ㄧˊ，「蛇」讀 ㄧˊ，指敷衍應付。
+飛揚跋扈|3|ㄏㄨˋ|ㄍㄨˋ|ㄆㄨˋ|ㄏㄨˇ|「扈」讀 ㄏㄨˋ（四聲），形容驕橫放肆。
+提綱挈領|2|ㄑㄧㄝˋ|ㄑㄧˋ|ㄐㄧㄝˊ|ㄑㄧˊ|「挈」讀 ㄑㄧㄝˋ（四聲），指提舉。
+風聲鶴唳|3|ㄌㄧˋ|ㄌㄟˋ|ㄊㄧˋ|ㄌㄧˇ|「唳」讀 ㄌㄧˋ（四聲），指鶴鳴聲，形容驚慌疑懼。
+`;
+
+        const EMPEROR_RAW = `
+龜茲|ㄑㄧㄡ ㄘˊ|ㄍㄨㄟ ㄗ|ㄐㄩㄣ ㄗ|ㄑㄧㄡ ㄗ|西域古國名，讀 ㄑㄧㄡ ㄘˊ，為經典破音地名。
+吐蕃|ㄊㄨˇ ㄅㄛ|ㄊㄨˇ ㄈㄢ|ㄊㄨˋ ㄅㄛ|ㄊㄨˇ ㄈㄢˊ|唐代藏族政權名，標準音讀 ㄊㄨˇ ㄅㄛ。
+大宛|ㄉㄚˋ ㄩㄢ|ㄉㄚˋ ㄨㄢˇ|ㄉㄞˋ ㄩㄢ|ㄉㄚˋ ㄨㄢ|漢代西域國名（出產汗血馬），「宛」讀 ㄩㄢ。
+單于|ㄔㄢˊ ㄩˊ|ㄉㄢ ㄩˊ|ㄕㄢˋ ㄩˊ|ㄔㄢˊ ㄩˇ|匈奴君主稱號，讀 ㄔㄢˊ ㄩˊ。
+可汗|ㄎㄜˋ ㄏㄢˊ|ㄎㄜˇ ㄏㄢˋ|ㄎㄜˋ ㄏㄢˋ|ㄎㄜˇ ㄏㄢˊ|古代鮮卑、突厥、蒙古最高統治者稱號，讀 ㄎㄜˋ ㄏㄢˊ。
+冒頓|ㄇㄛˋ ㄉㄨˊ|ㄇㄠˋ ㄉㄨㄣˋ|ㄇㄛˋ ㄉㄨㄣˋ|ㄇㄠˋ ㄉㄨˊ|匈奴著名單于之名，讀 ㄇㄛˋ ㄉㄨˊ。
+阿房宮|ㄜ ㄆㄤˊ ㄍㄨㄥ|ㄚ ㄈㄤˊ ㄍㄨㄥ|ㄜ ㄈㄤˊ ㄍㄨㄥ|ㄚ ㄆㄤˊ ㄍㄨㄥ|秦代宮殿名，台灣教育部標準音讀 ㄜ ㄆㄤˊ ㄍㄨㄥ。
+柏林|ㄅㄛˊ ㄌㄧㄣˊ|ㄅㄞˇ ㄌㄧㄣˊ|ㄅㄛˋ ㄌㄧㄣˊ|ㄅㄞˋ ㄌㄧㄣˊ|德國首都名，台灣教育部標準音讀 ㄅㄛˊ ㄌㄧㄣˊ。
+華盛頓|ㄏㄨㄚˊ ㄕㄥˋ ㄉㄨㄣˋ|ㄏㄨㄚˋ ㄕㄥˋ ㄉㄨㄣˋ|ㄏㄨㄚ ㄕㄥˋ ㄉㄨㄣˋ|ㄏㄨㄚˊ ㄕㄥ ㄉㄨㄣˋ|美國首都與首任總統譯名，「華」讀 ㄏㄨㄚˊ（二聲）。
+太行山|ㄊㄞˋ ㄏㄤˊ ㄕㄢ|ㄊㄞˋ ㄒㄧㄥˊ ㄕㄢ|ㄊㄞˋ ㄏㄤˋ ㄕㄢ|ㄊㄞˋ ㄒㄧㄥˋ ㄕㄢ|中國著名山脈，「行」在此讀 ㄏㄤˊ（二聲）。
+會稽|ㄎㄨㄞˋ ㄐㄧ|ㄏㄨㄟˋ ㄐㄧ|ㄏㄨㄟˋ ㄐㄧˋ|ㄎㄨㄞˋ ㄐㄧˋ|古地名與山名（今浙江紹興），讀 ㄎㄨㄞˋ ㄐㄧ。
+番禺|ㄆㄢ ㄩˊ|ㄈㄢ ㄩˊ|ㄆㄢ ㄩˇ|ㄈㄢ ㄩˇ|廣東古縣名，「番」在此讀 ㄆㄢ（一聲）。
+天台山|ㄊㄧㄢ ㄊㄞ ㄕㄢ|ㄊㄧㄢ ㄊㄞˊ ㄕㄢ|ㄊㄧㄢˋ ㄊㄞ ㄕㄢ|ㄊㄧㄢ ㄊㄞˇ ㄕㄢ|浙江名山名，「台」在此讀 ㄊㄞ（一聲）。
+長安|ㄔㄤˊ ㄢ|ㄓㄤˇ ㄢ|ㄔㄤˊ ㄢˋ|ㄓㄤˋ ㄢ|漢唐古都，「長」讀 ㄔㄤˊ。
+尉遲|ㄩˋ ㄔˊ|ㄨㄟˋ ㄔˊ|ㄩˋ ㄓˋ|ㄨㄟˋ ㄓˋ|複姓（如唐將尉遲恭），讀 ㄩˋ ㄔˊ。
+万俟|ㄇㄛˋ ㄑㄧˊ|ㄨㄢˋ ㄙˋ|ㄇㄛˋ ㄙˋ|ㄨㄢˋ ㄑㄧˊ|複姓，「万」讀 ㄇㄛˋ，「俟」讀 ㄑㄧˊ。
+澹臺|ㄊㄢˊ ㄊㄞˊ|ㄉㄢˋ ㄊㄞˊ|ㄊㄢˊ ㄊㄞ|ㄉㄢˋ ㄊㄞ|複姓（如孔子弟子澹臺滅明），讀 ㄊㄢˊ ㄊㄞˊ。
+區區|ㄑㄩ ㄑㄩ|ㄡ ㄡ|ㄑㄩ ㄡ|ㄡ ㄑㄩ|作微不足道解讀 ㄑㄩ ㄑㄩ；作姓氏時「區」讀 ㄡ。
+鼕鼕|ㄉㄨㄥ ㄉㄨㄥ|ㄉㄨㄥˊ ㄉㄨㄥˊ|ㄊㄨㄥ ㄊㄨㄥ|ㄉㄨㄥˋ ㄉㄨㄥˋ|形容敲鼓聲，讀 ㄉㄨㄥ ㄉㄨㄥ（一聲）。
+饕餮|ㄊㄠ ㄊㄧㄝˋ|ㄊㄠˊ ㄊㄧㄝ|ㄏㄠˋ ㄊㄧㄝˋ|ㄊㄠ ㄊㄧㄢˇ|上古貪食凶獸，讀 ㄊㄠ ㄊㄧㄝˋ。
+酈食其|ㄌㄧˋ ㄧˋ ㄐㄧ|ㄌㄧˋ ㄕˊ ㄑㄧˊ|ㄌㄧˋ ㄙˋ ㄐㄧ|ㄌㄧˋ ㄕˊ ㄐㄧ|秦漢名士，人名讀 ㄌㄧˋ ㄧˋ ㄐㄧ。
+大月氏|ㄉㄚˋ ㄖㄡˋ ㄓ|ㄉㄚˋ ㄩㄝˋ ㄕˋ|ㄉㄚˋ ㄩㄝˋ ㄓ|ㄉㄚˋ ㄖㄡˋ ㄕˋ|漢代西域民族名，讀 ㄉㄚˋ ㄖㄡˋ ㄓ。
+身毒|ㄩㄢ ㄉㄨˊ|ㄕㄣ ㄉㄨˊ|ㄐㄩㄢ ㄉㄨˊ|ㄕㄣ ㄉㄨˇ|古代對印度的譯稱，讀 ㄩㄢ ㄉㄨˊ。
+澠池|ㄇㄧㄢˇ ㄔˊ|ㄕㄥˊ ㄔˊ|ㄇㄧㄣˇ ㄔˊ|ㄕㄥˋ ㄔˊ|戰國秦趙會盟古地名，讀 ㄇㄧㄢˇ ㄔˊ。
+澶淵|ㄔㄢˊ ㄩㄢ|ㄉㄢˋ ㄩㄢ|ㄕㄢˋ ㄩㄢ|ㄓㄢ ㄩㄢ|北宋「澶淵之盟」古地名，讀 ㄔㄢˊ ㄩㄢ。
+厓山|ㄧㄞˊ ㄕㄢ|ㄧㄚˊ ㄕㄢ|ㄞˊ ㄕㄢ|ㄧㄚˋ ㄕㄢ|南宋末年海戰古地名，讀 ㄧㄞˊ ㄕㄢ。
+樊噲|ㄈㄢˊ ㄎㄨㄞˋ|ㄈㄢˊ ㄏㄨㄟˋ|ㄈㄢˇ ㄎㄨㄞˋ|ㄈㄢˊ ㄍㄨㄟˋ|漢初名將，「噲」讀 ㄎㄨㄞˋ。
+高麗|ㄍㄠ ㄌㄧˊ|ㄍㄠ ㄌㄧˋ|ㄍㄠ ㄌㄨㄛˊ|ㄍㄠ ㄌㄟˊ|朝鮮半島古國名，讀 ㄍㄠ ㄌㄧˊ（二聲）。
+燕然|ㄧㄢ ㄖㄢˊ|ㄧㄢˋ ㄖㄢˊ|ㄧㄢ ㄖㄢˇ|ㄧㄢˋ ㄖㄢˇ|「勒石燕然」古山名，國名地名讀 ㄧㄢ（一聲）。
+令狐|ㄌㄧㄥˊ ㄏㄨˊ|ㄌㄧㄥˋ ㄏㄨˊ|ㄌㄧㄥˇ ㄏㄨˊ|ㄌㄧㄥˊ ㄏㄨˇ|複姓，「令」在此讀 ㄌㄧㄥˊ（二聲）。
+皇甫|ㄏㄨㄤˊ ㄈㄨˇ|ㄏㄨㄤˊ ㄆㄨˇ|ㄏㄨㄤˊ ㄈㄨˋ|ㄏㄨㄤˋ ㄈㄨˇ|複姓（如皇甫謐），讀 ㄏㄨㄤˊ ㄈㄨˇ。
+宇文|ㄩˇ ㄨㄣˊ|ㄩˊ ㄨㄣˊ|ㄩˋ ㄨㄣˊ|ㄨˇ ㄨㄣˊ|鮮卑複姓（北周皇室），讀 ㄩˇ ㄨㄣˊ。
+長孫|ㄓㄤˇ ㄙㄨㄣ|ㄔㄤˊ ㄙㄨㄣ|ㄓㄤˋ ㄙㄨㄣ|ㄔㄤˇ ㄙㄨㄣ|唐初名臣長孫無忌複姓，讀 ㄓㄤˇ ㄙㄨㄣ。
+呼延|ㄏㄨ ㄧㄢˊ|ㄏㄨ ㄧㄢˇ|ㄏㄨˋ ㄧㄢˊ|ㄏㄨ ㄧㄢˋ|匈奴貴族複姓，讀 ㄏㄨ ㄧㄢˊ。
+拓跋|ㄊㄨㄛˋ ㄅㄚˊ|ㄊㄚˋ ㄅㄚˊ|ㄊㄨㄛˋ ㄅㄚˋ|ㄊㄚˋ ㄅㄚˋ|北魏皇室複姓，讀 ㄊㄨㄛˋ ㄅㄚˊ。
+慕容|ㄇㄨˋ ㄖㄨㄥˊ|ㄇㄨˋ ㄖㄨㄥˇ|ㄇㄛˋ ㄖㄨㄥˊ|ㄇㄨˋ ㄩㄥˊ|鮮卑複姓（燕國皇室），讀 ㄇㄨˋ ㄖㄨㄥˊ。
+耶律|ㄧㄝ ㄌㄩˋ|ㄧㄝˊ ㄌㄩˋ|ㄧㄝˇ ㄌㄩˋ|ㄧㄚˊ ㄌㄩˋ|遼國皇室複姓（如耶律楚材），讀 ㄧㄝ ㄌㄩˋ。
+完顏|ㄨㄢˊ ㄧㄢˊ|ㄨㄢˇ ㄧㄢˊ|ㄨㄢˋ ㄧㄢˊ|ㄨㄢˊ ㄧㄢˇ|金國皇室複姓（如完顏阿骨打），讀 ㄨㄢˊ ㄧㄢˊ。
+愛新覺羅|ㄞˋ ㄒㄧㄣ ㄐㄩㄝˊ ㄌㄨㄛˊ|ㄞˋ ㄒㄧㄣ ㄐㄧㄠˋ ㄌㄨㄛˊ|ㄞˋ ㄒㄧㄣ ㄐㄩㄝˋ ㄌㄨㄛˊ|ㄞˋ ㄒㄧㄣ ㄐㄧㄠˇ ㄌㄨㄛˊ|清代皇室姓氏，「覺」讀 ㄐㄩㄝˊ。
+伯顏|ㄅㄛˊ ㄧㄢˊ|ㄅㄞˇ ㄧㄢˊ|ㄅㄛˋ ㄧㄢˊ|ㄅㄚˋ ㄧㄢˊ|元代名將人名，「伯」讀 ㄅㄛˊ。
+嚳|ㄎㄨˋ|ㄍㄠˋ|ㄍㄨˇ|ㄎㄨ|上古五帝之一帝嚳，讀 ㄎㄨˋ（四聲）。
+顓頊|ㄓㄨㄢ ㄒㄩ|ㄓㄨㄢ ㄒㄩˋ|ㄔㄨㄢˊ ㄒㄩ|ㄓㄨㄢ ㄩˋ|上古五帝之一，讀 ㄓㄨㄢ ㄒㄩ（一聲）。
+皐陶|ㄍㄠ ㄧㄠˊ|ㄍㄠ ㄊㄠˊ|ㄍㄠ ㄊㄠ|ㄏㄠˋ ㄧㄠˊ|堯舜時代掌管刑獄之賢臣，讀 ㄍㄠ ㄧㄠˊ。
+契|ㄒㄧㄝˋ|ㄑㄧˋ|ㄑㄧㄝˋ|ㄐㄧㄝˊ|商族始祖人名，讀 ㄒㄧㄝˋ（四聲）。
+后稷|ㄏㄡˋ ㄐㄧˋ|ㄏㄡˋ ㄐㄧˊ|ㄏㄡˋ ㄗㄜˊ|ㄏㄡˋ ㄐㄧˇ|周族農神始祖，讀 ㄏㄡˋ ㄐㄧˋ。
+比干|ㄅㄧˇ ㄍㄢ|ㄅㄧˋ ㄍㄢ|ㄅㄧˇ ㄍㄢˋ|ㄆㄧˊ ㄍㄢ|商末忠臣，讀 ㄅㄧˇ ㄍㄢ。
+箕子|ㄐㄧ ㄗˇ|ㄐㄧˊ ㄗˇ|ㄑㄧˊ ㄗˇ|ㄐㄧˇ ㄗˇ|商末賢臣，讀 ㄐㄧ ㄗˇ。
+褒姒|ㄅㄠ ㄙˋ|ㄅㄠ ㄕˋ|ㄅㄠ ㄗˇ|ㄆㄠˊ ㄙˋ|周幽王寵妃，「姒」讀 ㄙˋ（四聲）。
+妲己|ㄉㄚˊ ㄐㄧˇ|ㄉㄢˋ ㄐㄧˇ|ㄉㄚˇ ㄐㄧˇ|ㄉㄚˊ ㄐㄧ|商紂王寵妃，「妲」讀 ㄉㄚˊ（二聲）。
+嬴政|ㄧㄥˊ ㄓㄥˋ|ㄧㄥˊ ㄓㄥ|ㄧㄥˋ ㄓㄥˋ|ㄧㄥˇ ㄓㄥˋ|秦始皇本名，「政」讀 ㄓㄥˋ。
+`;
+
+        const parseBank = t => t.trim().split('\n').map(l => {
+            const [word, ...o] = l.split('|');
+            return { word, correct: o[0], options: o.slice(0, 4), note: o[4] };
+        });
+        const parseIdiomBank = t => t.trim().split('\n').map(l => {
+            const [word, idxStr, ...o] = l.split('|');
+            return { word, targetIdx: +idxStr, correct: o[0], options: o.slice(0, 4), note: o[4], isIdiom: true };
+        });
+
+        const originalQuestions = parseBank(RAW_BANK);
+        const rareQuestions = parseBank(RARE_BANK).map(q => ({ ...q, rare: true }));
+        const idiomQuestions = parseIdiomBank(IDIOM_RAW);
+        const emperorQuestions = parseBank(EMPEROR_RAW).map(q => ({ ...q, rare: true, tag: '👑 御製欽題' }));
+
+        const GLYPH_STYLE = {
+            seal:   { color: '#1f1405', sw: 3.6, tag: '🏺 小篆銘文', name: '小篆' },
+            oracle: { color: '#3d220c', sw: 3,   tag: '🦴 甲骨卜辭', name: '甲骨文' }
+        };
+        const G = (lv, rows) => rows.map(([c, svg, d, note]) => ({
+            word: c, correct: c, options: [c, ...d], note, svg, level: lv, rare: true,
+            tag: GLYPH_STYLE[lv].tag, name: GLYPH_STYLE[lv].name
+        }));
+        const GLYPH_BANK = {
+            oracle: G('oracle', [
+                ['象', '<path d="M32 24C22 26 20 40 24 52C28 64 22 76 26 88M32 24C48 16 76 22 84 40L80 62M80 62V90M66 64V90M44 62V90M26 88H32M84 44L92 56"/><circle cx="36" cy="30" r="1.8"/>', ['豕', '鹿', '馬'], '象形字，突出長長的鼻子與粗壯的四肢。'],
+                ['虎', '<path d="M12 34L30 22L44 34L38 44L46 52L26 52L12 34M20 42L16 50M28 44L26 52M44 34C60 28 76 32 86 40L80 58H46M54 32L52 46M64 31L62 46M74 34L72 48M50 58V88M74 58V88M86 40C96 30 94 22 88 16"/>', ['貓', '豹', '犬'], '象形字，突出張大的嘴、尖牙和身上的斑紋。'],
+                ['犬', '<path d="M14 40L30 28L42 34L38 46M38 46C52 40 72 42 78 50M78 50C90 44 92 30 82 22M46 46V88M72 50V88M46 64H72"/>', ['豕', '大', '太'], '象形字，身體瘦長、尾巴上翹，與「豕」的肥肚子不同。'],
+                ['豕', '<path d="M12 46L28 36L40 42L36 54M40 40C56 28 78 34 84 48C86 66 74 78 56 76C46 74 40 64 36 54M46 76V92M70 76V92M84 48L94 58"/>', ['犬', '象', '羊'], '象形字，突出垂下的大肚子與短尾巴，是「豬」的古字。'],
+                ['舟', '<path d="M10 46C30 66 70 66 90 46M10 46H90M24 46V62M40 46V66M56 46V66M72 46V62"/>', ['月', '丹', '冊'], '象形字，像一艘有船艙隔板的小船。'],
+                ['弓', '<path d="M64 10C26 24 26 76 64 90M64 10V90M44 48H68"/>', ['戈', '引', '矢'], '象形字，像一張弓與繃緊的弓弦。'],
+                ['禾', '<path d="M50 92V30M50 30C54 12 78 12 72 32M50 52L28 64M50 52L72 64M50 72L34 84M50 72L66 84"/>', ['木', '米', '未'], '象形字，像穀物成熟後穗頭下垂。'],
+                ['酉', '<path d="M34 12H66M38 12C30 30 32 60 40 82H60C68 60 70 30 62 12M36 38H64M38 60H62"/>', ['酒', '西', '由'], '象形字，像一個盛酒的尖底罈子。'],
+                ['魚', '<path d="M16 50C34 26 62 26 76 50C62 74 34 74 16 50ZM76 50L92 34M76 50L92 66M44 38V62M56 36V64"/><circle cx="30" cy="46" r="2"/>', ['鳥', '龜', '蟲'], '象形字，像一條魚，有頭、身體與魚尾。'],
+                ['牛', '<path d="M20 12C22 38 34 46 50 46C66 46 78 38 80 12M50 46V92M36 64H64"/>', ['羊', '午', '犬'], '象形字，突出兩隻向上彎的牛角，像牛頭。'],
+                ['羊', '<path d="M18 38C22 12 44 20 50 40C56 20 78 12 82 38M50 40V92M36 64H64"/>', ['牛', '美', '羽'], '象形字，突出向下彎曲的羊角，與牛角的方向相反。'],
+                ['雨', '<path d="M12 22H88M28 38V52M44 36V58M60 38V52M76 36V58M36 70V80M68 68V82"/>', ['水', '雪', '云'], '會意字，上面一橫是天，下面的點是落下的雨滴。'],
+                ['子', '<circle cx="50" cy="26" r="12"/><path d="M50 38V68M20 50L50 44L80 50M42 92L50 68L58 92"/>', ['女', '了', '孔'], '象形字，像有頭、雙臂和雙腿的小孩。'],
+                ['女', '<path d="M44 12C54 20 52 32 46 40L58 64L70 90M26 50L66 62M64 46L36 66"/>', ['母', '子', '人'], '象形字，像雙手交叉、跪坐的女子。'],
+                ['手', '<path d="M50 92V58M50 58C36 50 28 36 26 18M50 58C44 44 44 30 44 12M50 58C56 44 58 30 62 12M50 58C66 52 72 40 78 26"/>', ['毛', '又', '爪'], '象形字，像伸開五指的手。'],
+                ['鳥', '<path d="M18 28L32 28L36 22C46 18 54 24 56 34C74 38 84 56 80 72L90 90M80 72L64 82M56 34C42 44 44 62 54 72M54 72L50 92M54 72L62 92"/>', ['隹', '魚', '羽'], '象形字，像一隻有喙、翅膀和尾巴的鳥。'],
+                ['車', '<ellipse cx="26" cy="58" rx="10" ry="22"/><ellipse cx="74" cy="58" rx="10" ry="22"/><path d="M16 58H84M50 58V14M38 14H62M50 58V92"/>', ['輪', '舟', '弓'], '象形字，像兩個車輪、車軸和車轅的戰車。'],
+                ['龜', '<ellipse cx="50" cy="56" rx="22" ry="28"/><path d="M50 28V84M30 46H70M28 64H72M44 28C42 14 58 14 56 28M30 42L14 34M70 42L86 34M30 70L14 80M70 70L86 80"/>', ['魚', '蛇', '蟲'], '象形字，從上往下看，有龜殼、頭、四肢和尾巴。甲骨文就是刻在龜甲上的。'],
+                ['馬', '<path d="M16 30L30 24L36 34L26 42M36 34C48 32 60 36 68 36C80 36 82 44 80 52L74 58M26 42C34 48 36 52 34 58M34 58V90M46 58V90M58 58V90M72 58V90M36 34L46 22M42 36L52 24M80 40L90 48"/>', ['鹿', '象', '虎'], '象形字，像有長臉、鬃毛、四條腿和尾巴的馬。'],
+                ['日', '<circle cx="50" cy="50" r="28"/><path d="M40 50H60"/>', ['月', '目', '田'], '象形字，像圓圓的太陽，中間一橫或一點表示太陽的光輝。'],
+                ['月', '<path d="M58 14C28 24 28 76 58 86C44 68 44 32 58 14Z"/><path d="M40 50H50"/>', ['日', '夕', '肉'], '象形字，像一彎新月。'],
+                ['山', '<path d="M14 82H86M24 82L30 42L42 82M42 82L50 18L58 82M58 82L70 42L76 82"/>', ['火', '出', '丘'], '象形字，像三座並立的山峰。'],
+                ['火', '<path d="M24 84C28 60 36 52 50 40C64 52 72 60 76 84M50 14V40M30 44L38 52M70 44L62 52"/>', ['山', '水', '炎'], '象形字，像向上竄升的火焰與火星。'],
+                ['木', '<path d="M50 14V86M20 34C32 42 42 44 50 44C58 44 68 42 80 34M22 76C34 66 42 62 50 62C58 62 66 66 78 76"/>', ['禾', '本', '未'], '象形字，上有枝葉、中有樹幹、下有樹根。'],
+                ['鹿', '<path d="M22 36L32 24L42 36M26 24L18 14M38 24L46 14M34 36L36 52H74C82 52 84 62 78 68M36 52V88M48 52V88M64 52V88M74 52V88M78 52L86 44"/>', ['馬', '象', '虎'], '象形字，突出頭上分岔的鹿角與修長四肢。'],
+                ['大', '<circle cx="50" cy="24" r="7"/><path d="M50 31V62M16 46L50 40L84 46M30 88L50 62L70 88"/>', ['天', '太', '人'], '象形字，像一個張開雙臂、雙腿站立的大人。'],
+                ['口', '<path d="M24 34C24 28 76 28 76 34C76 58 64 72 50 72C36 72 24 58 24 34Z"/>', ['日', '甘', '言'], '象形字，像人張開的嘴巴。'],
+                ['人', '<path d="M54 16C48 40 38 64 24 84M44 48C56 60 66 72 78 84"/>', ['入', '大', '刀'], '象形字，像側面彎腰行禮的人。'],
+                ['冊', '<path d="M24 18V82M42 18V82M58 18V82M76 18V82M14 40C38 46 62 34 86 40M14 62C38 68 62 56 86 62"/>', ['門', '典', '用'], '象形字，像用繩子把竹簡一片片編串起來的書冊。'],
+                ['門', '<path d="M20 84V22H44V84M56 84V22H80V84M20 22H44M56 22H80"/>', ['戶', '開', '問'], '象形字，像左右兩扇對開的門板。'],
+                ['目', '<path d="M16 50C32 30 68 30 84 50C68 70 32 70 16 50Z"/><circle cx="50" cy="50" r="9"/>', ['日', '耳', '自'], '象形字，像一隻橫著的眼睛與瞳孔。'],
+                ['耳', '<path d="M36 18C62 12 72 34 64 52C58 66 56 82 42 86M36 18C28 34 28 58 38 72M42 42C50 40 54 48 48 56"/>', ['目', '口', '身'], '象形字，像人耳朵的輪廓。'],
+                ['水', '<path d="M50 14C42 36 58 64 50 88M26 24C22 42 30 58 24 76M74 24C70 42 78 58 72 76M36 32V38M64 60V66"/>', ['川', '雨', '火'], '象形字，中間是主河道，兩旁是飛濺的水點。'],
+                ['田', '<rect x="20" y="20" width="60" height="60"/><path d="M50 20V80M20 50H80"/>', ['甲', '由', '土'], '象形字，像劃分整齊的農田阡陌。'],
+                ['刀', '<path d="M34 16C56 16 74 28 70 52C66 72 52 84 36 88M34 16C36 40 28 62 18 76"/>', ['力', '弓', '人'], '象形字，像一把有弧度刀刃的彎刀。'],
+                ['貝', '<path d="M30 22C30 14 70 14 70 22L74 64C74 78 26 78 26 64ZM30 42H70M50 16V74"/>', ['見', '目', '鼎'], '象形字，像一枚有紋路的海貝，古代用作貨幣。'],
+                ['心', '<path d="M34 22C24 44 26 70 48 82C70 72 76 46 66 24M50 30V54"/>', ['手', '火', '口'], '象形字，像一顆跳動的心臟輪廓。'],
+                ['王', '<path d="M26 26H74M18 78H82M50 26V78M32 52H68"/>', ['土', '大', '工'], '象形字，原像一把雙刃大斧（鉞），象徵王權。'],
+                ['林', '<path d="M32 18V84M14 36L32 46L48 36M16 74L32 62L46 74M68 18V84M52 36L68 46L86 36M54 74L68 62L84 74"/>', ['森', '木', '竹'], '會意字，兩棵樹並立成林。'],
+                ['森', '<path d="M50 10V46M36 22L50 30L64 22M38 40L50 32L62 40M30 50V88M14 62L30 70L44 62M16 84L30 74L44 84M70 50V88M56 62L70 70L86 62M56 84L70 74L84 84"/>', ['林', '木', '品'], '會意字，三棵樹聚在一起，表示樹木眾多。'],
+                ['休', '<path d="M32 20V84M14 38L32 48L48 38M16 74L32 62L48 74M68 24C64 44 56 64 46 80M62 48L78 78"/>', ['林', '采', '保'], '會意字，像一個人靠在樹旁休息。'],
+                ['明', '<circle cx="34" cy="50" r="16"/><path d="M28 50H40M72 22C54 32 54 68 72 78C64 62 64 38 72 22Z"/>', ['日', '月', '易'], '會意字，左邊是太陽（或窗），右邊是月亮，表示明亮。'],
+                ['從', '<path d="M38 20C32 44 24 64 14 82M30 48L44 74M74 20C68 44 60 64 50 82M66 48L80 74"/>', ['比', '北', '人'], '會意字，像兩個人一前一後相隨而行。'],
+                ['比', '<path d="M34 20C28 44 22 64 16 82M28 48L42 66M70 20C64 44 58 64 52 82M64 48L78 66"/>', ['從', '北', '並'], '會意字，兩人並肩而立，表示比較、並列。'],
+                ['北', '<path d="M34 22C40 44 40 66 30 82M38 48L20 62M66 22C60 44 60 66 70 82M62 48L80 62"/>', ['比', '從', '背'], '會意字，兩人背對背站立，是「背」的本字。'],
+                ['立', '<circle cx="50" cy="22" r="7"/><path d="M50 29V66M22 48L50 40L78 48M32 82L50 66L68 82M14 84H86"/>', ['大', '位', '天'], '會意字，像一個「大」人穩穩站在地上。'],
+                ['出', '<path d="M24 58C24 76 76 76 76 58M50 18V70M36 44L50 30L64 44"/>', ['山', '入', '土'], '會意字，像腳跨出洞穴或土坑的樣子。'],
+                ['天', '<rect x="38" y="14" width="24" height="18" rx="4"/><path d="M50 32V62M18 46L50 40L82 46M30 88L50 62L70 88"/>', ['大', '夫', '立'], '會意字，突出人頭頂之上至高無上的天空。'],
+                ['土', '<path d="M50 22V80M26 52H74M16 80H84"/><ellipse cx="50" cy="36" rx="10" ry="14"/>', ['王', '士', '山'], '象形字，像地面上堆積起來的土塊。'],
+                ['竹', '<path d="M34 18V82M66 18V82M18 36L34 26L46 36M54 36L66 26L82 36"/>', ['林', '艸', '木'], '象形字，像兩枝葉片下垂的竹子。']
+            ]),
+            seal: G('seal', [
+                ['鼎', '<path d="M28 20V34M72 20V34M24 34H76M28 34C26 56 34 66 50 66C66 66 74 56 72 34M50 66V74M36 70L28 88M64 70L72 88M38 46H62"/>', ['貞', '鼓', '員'], '象形字，像兩耳、圓腹、三足的青銅鼎，是古代煮食與祭祀的重要器物。'],
+                ['弓', '<path d="M62 12C30 24 28 76 62 88M62 12V88M44 48H64M62 12L72 20"/>', ['引', '己', '弔'], '象形字，小篆像一張彎曲的弓。'],
+                ['舟', '<path d="M30 14C26 36 28 64 40 84M70 14C74 36 72 64 60 84M50 14V84M38 40H62M36 60H64"/>', ['丹', '月', '周'], '象形字，小篆像一艘船。'],
+                ['禾', '<path d="M50 12V90M50 24C40 20 30 24 24 32M50 24C60 20 70 24 76 32M50 44C38 48 28 56 20 64M50 44C62 48 72 56 80 64"/>', ['木', '未', '秉'], '象形字，小篆像穗頭下垂的穀物。'],
+                ['米', '<path d="M50 12V88M16 50H84M26 26L40 38M74 26L60 38M26 74L40 62M74 74L60 62"/>', ['來', '朱', '采'], '象形字，中間一橫分開，上下各有米粒。'],
+                ['刀', '<path d="M28 18C48 16 70 18 72 40C72 62 60 80 38 90M28 18C30 40 24 62 14 74"/>', ['力', '刃', '刁'], '象形字，像一把有刀背與刀刃的刀。'],
+                ['又', '<path d="M16 30C36 26 62 30 78 46M20 52C40 48 56 54 66 64M52 30C60 54 62 72 54 88"/>', ['叉', '文', '及'], '象形字，像伸出三根手指的右手，是「右」的本字。'],
+                ['貝', '<path d="M30 18H70V66H30ZM30 34H70M30 50H70M40 66L32 86M60 66L68 86"/>', ['見', '具', '目'], '象形字，像一枚貝殼；古代曾拿貝殼當貨幣。'],
+                ['水', '<path d="M50 12V86C50 90 46 90 42 88M14 64C28 62 40 54 46 40M86 64C72 62 60 54 54 40M18 44C26 42 34 38 40 28M82 44C74 42 66 38 60 28"/>', ['冰', '永', '求'], '象形字，小篆像水流：中間一道主流，兩旁各有細流。'],
+                ['女', '<path d="M40 18C54 12 60 28 50 38M50 38C36 50 34 68 40 86M50 38C64 50 68 68 62 86M28 54L70 60M36 48L66 72"/>', ['母', '毋', '如'], '象形字，小篆像雙手交叉、跪坐的女子。'],
+                ['子', '<path d="M50 14C66 14 68 34 50 38C34 34 34 14 50 14ZM50 38V78C50 86 44 88 38 86M18 52C34 48 66 48 82 52"/>', ['了', '孔', '字'], '象形字，小篆像有頭、雙臂的小孩。'],
+                ['手', '<path d="M50 92V58M50 58C40 50 34 36 30 20M50 58C46 46 46 32 46 14M50 58C54 46 56 30 62 14M50 58C62 52 70 40 78 28M34 76H66"/>', ['毛', '牛', '年'], '象形字，小篆像伸開五指的手。'],
+                ['心', '<path d="M30 28C24 56 36 78 52 80C68 78 78 58 74 38M50 34V58M20 44C26 52 28 62 34 70"/>', ['必', '小', '少'], '象形字，像一顆心臟。'],
+                ['雨', '<path d="M12 22H88M50 22V34M26 34V86M74 34V86M38 48V56M38 66V74M60 48V56M60 66V74"/>', ['兩', '而', '面'], '會意字，上面一橫是天，裡面的點是雨滴。'],
+                ['門', '<path d="M16 84V22H42V84M58 84V22H84V84M16 22H42M58 22H84"/>', ['戶', '問', '閃'], '象形字，像左右兩扇門板。'],
+                ['田', '<rect x="22" y="22" width="56" height="56" rx="6"/><path d="M50 22V78M22 50H78"/>', ['由', '甲', '申'], '象形字，像劃分成塊的田地。'],
+                ['王', '<path d="M22 24H78M26 52H74M16 80H84M50 24V80"/>', ['玉', '主', '土'], '傳統說法：三橫代表天、地、人，一豎貫通三者。'],
+                ['羊', '<path d="M26 14C28 28 34 30 40 30M74 14C72 28 66 30 60 30M24 40H76M30 56H70M50 30V90"/>', ['牛', '半', '美'], '象形字，小篆像羊頭上的角與身體。'],
+                ['目', '<rect x="32" y="12" width="36" height="76" rx="12"/><path d="M32 38H68M32 62H68"/>', ['日', '自', '且'], '象形字，像一隻豎起來的眼睛。'],
+                ['日', '<circle cx="50" cy="50" r="30"/><path d="M26 50H74"/>', ['目', '口', '甘'], '象形字，小篆圓框內有一橫，代表太陽。'],
+                ['月', '<path d="M62 14C30 22 28 76 62 86C48 68 48 32 62 14Z"/><path d="M38 46H52"/>', ['夕', '肉', '丹'], '象形字，小篆像一彎新月。'],
+                ['山', '<path d="M16 82H84M22 82V42C22 34 30 34 30 42V82M46 82V20C46 12 54 12 54 20V82M70 82V42C70 34 78 34 78 42V82"/>', ['出', '火', '岳'], '象形字，小篆像三座圓潤的山峰。'],
+                ['木', '<path d="M50 14V86M18 32C32 42 42 44 50 44C58 44 68 42 82 32M18 76C32 64 42 60 50 60C58 60 68 64 82 76"/>', ['禾', '米', '林'], '象形字，小篆呈現樹木上枝下根的對稱感。'],
+                ['口', '<path d="M22 30C22 24 78 24 78 30C78 54 68 74 50 74C32 74 22 54 22 30Z"/>', ['日', '甘', '回'], '象形字，像張開的嘴巴。'],
+                ['人', '<path d="M52 16C48 44 36 68 20 84M46 42C58 58 68 72 80 84"/>', ['入', '八', '大'], '象形字，小篆像一個側面彎腰站立的人。'],
+                ['火', '<path d="M24 84C28 58 38 48 50 34C62 48 72 58 76 84M50 12V34M30 40C34 48 38 52 42 54M70 40C66 48 62 52 58 54"/>', ['山', '炎', '水'], '象形字，小篆像燃燒上升的火焰。'],
+                ['大', '<path d="M50 14V58M18 38C34 44 66 44 82 38M22 86C34 70 42 62 50 58C58 62 66 70 78 86"/>', ['天', '夫', '太'], '象形字，小篆像張開雙手雙腳站立的大人。'],
+                ['竹', '<path d="M36 16V86M64 16V86M20 34L36 26M46 34L36 26M52 34L64 26M80 34L64 26"/>', ['林', '艸', '木'], '象形字，像兩根並立、葉片下垂的竹枝。'],
+                ['石', '<path d="M18 22H82M42 22C36 42 26 60 16 74M40 48H74V80H40Z"/>', ['右', '后', '岩'], '會意字，上面是山崖，下面是山崖下的石塊。'],
+                ['冊', '<path d="M26 16V84M42 16V84M58 16V84M74 16V84M16 42H84M16 62H84"/>', ['典', '用', '刪'], '象形字，小篆像繩編的竹簡書冊。'],
+                ['天', '<path d="M24 22H76M50 22V60M20 42C36 48 64 48 80 42M24 86C36 72 44 64 50 60C56 64 64 72 76 86"/>', ['大', '夫', '立'], '會意字，小篆在「大」字上方加一橫，指人頭頂之天。'],
+                ['土', '<path d="M50 18V82M28 50H72M16 82H84"/>', ['王', '士', '工'], '象形字，小篆像地面上培土成堆之形。'],
+                ['川', '<path d="M26 18C22 40 30 62 24 84M50 18C46 40 54 62 48 84M74 18C70 40 78 62 72 84"/>', ['水', '州', '順'], '象形字，小篆像三條並流不息的大河。'],
+                ['耳', '<path d="M36 16C62 12 72 32 64 54C58 70 52 84 38 86M36 16C28 36 28 60 36 74M38 40H56M36 58H54"/>', ['目', '口', '見'], '象形字，小篆像人耳垂與耳輪之形。'],
+                ['立', '<path d="M50 16V58M22 36C36 42 64 42 78 36M28 80C38 66 44 60 50 58C56 60 62 66 72 80M14 82H86"/>', ['大', '位', '天'], '會意字，小篆像人雙腳穩立於大地之上。'],
+                ['出', '<path d="M24 54C24 76 76 76 76 54M50 16V70M32 34C32 48 68 48 68 34"/>', ['山', '入', '土'], '象形字，小篆像草木破土而出（或腳步跨出）。'],
+                ['林', '<path d="M30 16V84M14 34C22 42 28 44 30 44C32 44 38 42 46 34M16 74C22 64 28 60 30 60C32 60 38 64 44 74M70 16V84M54 34C62 42 68 44 70 44C72 44 78 42 86 34M56 74C62 64 68 60 70 60C72 60 78 64 84 74"/>', ['森', '木', '竹'], '會意字，兩木並立，表示樹林成片。'],
+                ['森', '<path d="M50 10V46M34 20C42 26 48 28 50 28C52 28 58 26 66 20M36 40C42 34 48 32 50 32C52 32 58 34 64 40M30 50V88M14 60C22 66 28 68 30 68C32 68 38 66 46 60M16 84C22 76 28 74 30 74C32 74 38 76 44 84M70 50V88M54 60C62 66 68 68 70 68C72 68 78 66 86 60M56 84C62 76 68 74 70 74C72 74 78 76 84 84"/>', ['林', '木', '炎'], '會意字，三木成眾，形容樹木茂密。'],
+                ['炎', '<path d="M28 46C34 28 44 22 50 12C56 22 66 28 72 46M50 12V38M24 88C30 66 42 58 50 48C58 58 70 66 76 88M50 48V78"/>', ['火', '森', '焚'], '會意字，上下兩「火」相疊，表示火勢熾盛。'],
+                ['品', '<rect x="36" y="14" width="28" height="24" rx="8"/><rect x="14" y="54" width="28" height="24" rx="8"/><rect x="58" y="54" width="28" height="24" rx="8"/>', ['晶', '眾', '森'], '會意字，三個「口」相疊，本義為眾多、品類。'],
+                ['晶', '<circle cx="50" cy="26" r="14"/><circle cx="28" cy="68" r="14"/><circle cx="72" cy="68" r="14"/><path d="M42 26H58M20 68H36M64 68H80"/>', ['品', '日', '明'], '會意字，三個「日」相疊，形容光輝明亮。'],
+                ['比', '<path d="M36 18C32 44 24 66 16 82M30 48L44 64M72 18C68 44 60 66 52 82M66 48L80 64"/>', ['從', '北', '並'], '會意字，小篆像兩人並肩靠攏，表示並列、比較。'],
+                ['從', '<path d="M38 18C34 44 26 66 16 82M32 48L46 68M72 18C68 44 60 66 50 82M66 48L80 68"/>', ['比', '北', '人'], '會意字，小篆像一人跟隨另一人行走。'],
+                ['北', '<path d="M36 20C40 44 40 66 30 82M38 48L20 60M64 20C60 44 60 66 70 82M62 48L80 60"/>', ['比', '從', '背'], '會意字，兩人背對而立，本義為相背。'],
+                ['休', '<path d="M32 18V84M16 36C24 44 30 46 32 46C34 46 40 44 48 36M18 74C24 64 30 60 32 60C34 60 40 64 46 74M70 22C66 44 58 64 48 82M64 48L80 78"/>', ['林', '采', '保'], '會意字，人依傍在樹木旁歇息。'],
+                ['采', '<path d="M24 22C42 18 60 18 76 24M34 22L28 38M50 20V38M66 22L72 38M50 42V86M22 58C36 64 64 64 78 58M26 82C38 72 62 72 74 82"/>', ['木', '米', '禾'], '會意字，上面是手爪，下面是樹木，像用手採摘果實。'],
+                ['明', '<rect x="18" y="30" width="26" height="40" rx="10"/><path d="M18 50H44M74 16C52 26 52 74 74 84C64 66 64 34 74 16Z"/><path d="M58 50H68"/>', ['日', '月', '目'], '會意字，左日（或窗）右月，合起來代表光明。'],
+                ['好', '<path d="M28 20C38 14 44 28 34 38C24 50 22 68 28 84M34 38C44 50 46 68 40 84M16 54L46 58M68 18C78 18 78 36 68 38C58 36 58 18 68 18ZM68 38V78C68 84 62 86 58 84M52 52H84"/>', ['女', '子', '安'], '會意字，左「女」右「子」，有女子懷抱幼兒、美好之意。'],
+                ['見', '<rect x="34" y="14" width="32" height="40" rx="10"/><path d="M34 30H66M34 42H66M40 54C36 70 28 80 18 86M60 54V82C60 86 68 86 78 82"/>', ['貝', '目', '人'], '會意字，上面是「目」，下面是「儿」（人），表示人張目看見。'],
+                ['車', '<ellipse cx="26" cy="54" rx="10" ry="20"/><ellipse cx="74" cy="54" rx="10" ry="20"/><path d="M16 54H84M50 14V86M36 22H64M36 78H64"/>', ['輪', '舟', '田'], '象形字，小篆像兩個車輪、車軸與車廂的戰車。']
+            ])
+        };
+
+        const BG = {
+            seal: '<defs><linearGradient id="bgb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b98f45"/><stop offset=".5" stop-color="#8f6b2c"/><stop offset="1" stop-color="#6a4d1c"/></linearGradient><pattern id="lw" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M1 11V1H11V9H4V4H8" fill="none" stroke="#2d1f08" stroke-opacity=".7" stroke-width="1.6"/></pattern></defs>'
+                + '<rect x="6" y="6" width="188" height="188" rx="10" fill="url(#bgb)" stroke="#3d2b0a" stroke-width="4"/><rect x="12" y="12" width="176" height="176" fill="url(#lw)"/>'
+                + '<rect x="34" y="34" width="132" height="132" rx="4" fill="url(#bgb)" stroke="#3d2b0a" stroke-width="3"/>'
+                + '<g fill="#4f8a68" fill-opacity=".33"><ellipse cx="52" cy="48" rx="16" ry="9"/><ellipse cx="148" cy="150" rx="18" ry="10"/><ellipse cx="150" cy="52" rx="10" ry="14"/></g>'
+                + '<g fill="#d9b566" stroke="#3d2b0a" stroke-width="2"><circle cx="22" cy="22" r="5"/><circle cx="178" cy="22" r="5"/><circle cx="22" cy="178" r="5"/><circle cx="178" cy="178" r="5"/></g>',
+            oracle: '<defs><radialGradient id="bgs" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#ead9a8"/><stop offset="1" stop-color="#bf9a5a"/></radialGradient></defs>'
+                + '<path d="M100 6C152 6 192 40 194 100C192 160 152 194 100 194C48 194 8 160 6 100C8 40 48 6 100 6Z" fill="url(#bgs)" stroke="#6b4a1f" stroke-width="4"/>'
+                + '<path d="M100 6V194M12 66H188M12 134H188" stroke="#7a5a2b" stroke-width="2" stroke-opacity=".55" fill="none"/>'
+                + '<g fill="#6b4a1f" fill-opacity=".6"><circle cx="40" cy="100" r="4"/><circle cx="160" cy="100" r="4"/><circle cx="100" cy="30" r="4"/><circle cx="100" cy="170" r="4"/></g>'
+                + '<path d="M26 100H52L60 90M174 100H148L140 110M100 18V40L110 48M100 182V160L90 152" stroke="#6b4a1f" stroke-opacity=".6" stroke-width="2" fill="none"/>'
+        };
+
+        // ----------------------------------------------------
+        // 2. 精緻宮廷人物立繪 SVG & 考官專屬語錄（含開考簡介、誇獎、酸話）
+        // ----------------------------------------------------
+        const EXAMINER_SVGS = {
+            read: `<svg viewBox="0 0 80 80" class="w-full h-full">
+                <defs>
+                    <linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef3c7"/><stop offset="1" stop-color="#fde68a"/></linearGradient>
+                    <linearGradient id="robe1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e40af"/><stop offset="1" stop-color="#1e3a8a"/></linearGradient>
+                    <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde4b8"/><stop offset="1" stop-color="#f5c98a"/></linearGradient>
+                </defs>
+                <rect width="80" height="80" fill="url(#bg1)"/>
+                <circle cx="40" cy="40" r="36" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-dasharray="3 2" opacity=".6"/>
+                <path d="M12 80C15 56 65 56 68 80Z" fill="url(#robe1)"/>
+                <path d="M28 58L40 70L52 58" fill="none" stroke="#f6dc82" stroke-width="3" stroke-linejoin="round"/>
+                <rect x="33" y="65" width="14" height="11" rx="1" fill="#b45309" stroke="#f6dc82" stroke-width="1"/>
+                <circle cx="22" cy="41" r="4" fill="#f5c98a"/><circle cx="58" cy="41" r="4" fill="#f5c98a"/>
+                <ellipse cx="40" cy="40" rx="17" ry="18" fill="url(#skin)"/>
+                <ellipse cx="29" cy="44" rx="3" ry="1.8" fill="#f87171" opacity=".45"/><ellipse cx="51" cy="44" rx="3" ry="1.8" fill="#f87171" opacity=".45"/>
+                <path d="M27 33Q32 30 36 33M44 33Q48 30 53 33" stroke="#e5e7eb" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+                <circle cx="32" cy="38" r="2.3" fill="#1c1917"/><circle cx="48" cy="38" r="2.3" fill="#1c1917"/>
+                <circle cx="32.8" cy="37.2" r=".8" fill="#fff"/><circle cx="48.8" cy="37.2" r=".8" fill="#fff"/>
+                <path d="M29 47Q35 44 40 47Q45 44 51 47Q48 59 40 62Q32 59 29 47Z" fill="#f3f4f6" stroke="#d1d5db" stroke-width=".8"/>
+                <path d="M36 48Q40 50 44 48" stroke="#991b1b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                <path d="M6 25Q16 23 24 27M74 25Q64 23 56 27" stroke="#111827" stroke-width="3.5" stroke-linecap="round"/>
+                <path d="M22 28C22 14 58 14 58 28Z" fill="#1f2937" stroke="#111827" stroke-width="1"/>
+                <rect x="20" y="25" width="40" height="5" rx="2" fill="#111827"/>
+                <circle cx="40" cy="22" r="3" fill="#d4af37" stroke="#fef08a" stroke-width="1"/>
+            </svg>`,
+            idiom: `<svg viewBox="0 0 80 80" class="w-full h-full">
+                <defs>
+                    <linearGradient id="bg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d1fae5"/><stop offset="1" stop-color="#a7f3d0"/></linearGradient>
+                    <linearGradient id="robe2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#047857"/><stop offset="1" stop-color="#064e3b"/></linearGradient>
+                </defs>
+                <rect width="80" height="80" fill="url(#bg2)"/>
+                <path d="M12 80C15 56 65 56 68 80Z" fill="url(#robe2)"/>
+                <path d="M28 57L40 69L52 57" fill="none" stroke="#fde68a" stroke-width="2.5"/>
+                <rect x="33" y="66" width="14" height="12" fill="#065f46" stroke="#f6dc82" stroke-width="1.2"/>
+                <path d="M36 74Q40 68 44 74" stroke="#fff" stroke-width="1.5" fill="none"/>
+                <circle cx="22" cy="41" r="4" fill="#f5c98a"/><circle cx="58" cy="41" r="4" fill="#f5c98a"/>
+                <ellipse cx="40" cy="40" rx="16.5" ry="17.5" fill="#fde4b8"/>
+                <path d="M27 33L36 34M53 33L44 34" stroke="#1f2937" stroke-width="2" stroke-linecap="round"/>
+                <path d="M28 38Q32 36 36 38M44 38Q48 36 52 38" stroke="#1c1917" stroke-width="1.8" fill="none"/>
+                <circle cx="32" cy="38.5" r="2" fill="#1c1917"/><circle cx="48" cy="38.5" r="2" fill="#1c1917"/>
+                <path d="M36 47Q40 50 44 47" stroke="#991b1b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                <path d="M37 53L40 60L43 53Z" fill="#1f2937"/>
+                <path d="M10 21Q17 20 22 25M70 21Q63 20 58 25" stroke="#111827" stroke-width="3.2" stroke-linecap="round"/>
+                <path d="M24 27L28 11H52L56 27Z" fill="#111827"/>
+                <rect x="22" y="24" width="36" height="5" rx="2" fill="#1f2937" stroke="#d4af37" stroke-width="1"/>
+                <rect x="36" y="15" width="8" height="6" rx="1" fill="#f6dc82"/>
+                <path d="M62 56L68 78" stroke="#78350f" stroke-width="3" stroke-linecap="round"/>
+                <path d="M61 52L64 58L60 58Z" fill="#1f2937"/>
+            </svg>`,
+            seal: `<svg viewBox="0 0 80 80" class="w-full h-full">
+                <defs>
+                    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fee2e2"/><stop offset="1" stop-color="#fecaca"/></linearGradient>
+                    <linearGradient id="robe3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#991b1b"/><stop offset="1" stop-color="#450a0a"/></linearGradient>
+                </defs>
+                <rect width="80" height="80" fill="url(#bg3)"/>
+                <path d="M12 80C15 56 65 56 68 80Z" fill="url(#robe3)"/>
+                <path d="M27 57L40 71L53 57" fill="none" stroke="#f6dc82" stroke-width="2.5"/>
+                <circle cx="22" cy="41" r="4" fill="#f5c98a"/><circle cx="58" cy="41" r="4" fill="#f5c98a"/>
+                <ellipse cx="40" cy="40" rx="16.5" ry="17.5" fill="#fde4b8"/>
+                <path d="M25 32Q31 28 36 33M55 32Q49 28 44 33" stroke="#f3f4f6" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                <circle cx="32" cy="38" r="2.1" fill="#1c1917"/><circle cx="48" cy="38" r="2.1" fill="#1c1917"/>
+                <path d="M28 47Q34 45 40 47Q46 45 52 47L45 65L40 69L35 65Z" fill="#f9fafb" stroke="#d1d5db" stroke-width=".8"/>
+                <path d="M26 26L30 7H50L54 26Z" fill="#7c1919" stroke="#d4af37" stroke-width="1.5"/>
+                <line x1="20" y1="16" x2="60" y2="16" stroke="#fde047" stroke-width="2.2" stroke-linecap="round"/>
+                <circle cx="20" cy="16" r="2.5" fill="#34d399"/><circle cx="60" cy="16" r="2.5" fill="#34d399"/>
+                <rect x="23" y="23" width="34" height="5" rx="2" fill="#450a0a" stroke="#d4af37" stroke-width="1"/>
+            </svg>`,
+            oracle: `<svg viewBox="0 0 80 80" class="w-full h-full">
+                <defs>
+                    <linearGradient id="bg4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef08a"/><stop offset="1" stop-color="#fcd34d"/></linearGradient>
+                    <linearGradient id="robe4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#57260b"/><stop offset="1" stop-color="#291003"/></linearGradient>
+                </defs>
+                <rect width="80" height="80" fill="url(#bg4)"/>
+                <path d="M12 80C15 56 65 56 68 80Z" fill="url(#robe4)"/>
+                <path d="M28 58L40 70L52 58" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                <circle cx="22" cy="42" r="4" fill="#ea9f63"/><circle cx="58" cy="42" r="4" fill="#ea9f63"/>
+                <ellipse cx="40" cy="41" rx="16.5" ry="17" fill="#f7b980"/>
+                <path d="M40 29L42 33L40 37L38 33Z" fill="#dc2626"/>
+                <path d="M27 35L36 37M53 35L44 37" stroke="#291003" stroke-width="2.2" stroke-linecap="round"/>
+                <circle cx="32" cy="40" r="2.2" fill="#1c1917"/><circle cx="48" cy="40" r="2.2" fill="#1c1917"/>
+                <path d="M35 49H45" stroke="#7c2d12" stroke-width="2" stroke-linecap="round"/>
+                <path d="M24 27L18 9L30 19L40 5L50 19L62 9L56 27Z" fill="#b45309" stroke="#fef08a" stroke-width="1"/>
+                <rect x="23" y="24" width="34" height="5" rx="2" fill="#78350f" stroke="#f6dc82" stroke-width="1.2"/>
+                <circle cx="40" cy="26.5" r="2.2" fill="#ef4444"/>
+            </svg>`,
+            emperor: `<svg viewBox="0 0 80 80" class="w-full h-full">
+                <defs>
+                    <radialGradient id="bg5" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="#991b1b"/><stop offset="1" stop-color="#3d0707"/></radialGradient>
+                    <linearGradient id="dragonRobe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde047"/><stop offset=".6" stop-color="#eab308"/><stop offset="1" stop-color="#a16207"/></linearGradient>
+                    <linearGradient id="goldCrown" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b45309"/><stop offset=".5" stop-color="#fef08a"/><stop offset="1" stop-color="#b45309"/></linearGradient>
+                </defs>
+                <rect width="80" height="80" fill="url(#bg5)"/>
+                <circle cx="40" cy="38" r="30" fill="#f6dc82" opacity=".16"/>
+                <path d="M10 80C14 54 66 54 70 80Z" fill="url(#dragonRobe)" stroke="#7c1919" stroke-width="1.5"/>
+                <path d="M27 56L40 71L53 56" fill="none" stroke="#991b1b" stroke-width="3"/>
+                <circle cx="24" cy="68" r="5" fill="none" stroke="#b45309" stroke-width="1.5"/>
+                <circle cx="56" cy="68" r="5" fill="none" stroke="#b45309" stroke-width="1.5"/>
+                <circle cx="40" cy="73" r="4" fill="#dc2626" stroke="#fef08a" stroke-width="1"/>
+                <circle cx="22" cy="42" r="4" fill="#f5c98a"/><circle cx="58" cy="42" r="4" fill="#f5c98a"/>
+                <ellipse cx="40" cy="41" rx="16.5" ry="17" fill="#fde4b8"/>
+                <path d="M26 35L36 37M54 35L44 37" stroke="#111827" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="32" cy="40" r="2.3" fill="#111827"/><circle cx="48" cy="40" r="2.3" fill="#111827"/>
+                <circle cx="32.7" cy="39.2" r=".8" fill="#fff"/><circle cx="48.7" cy="39.2" r=".8" fill="#fff"/>
+                <path d="M32 48Q40 45 48 48" stroke="#1f2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M35 50Q40 53 45 50" stroke="#991b1b" stroke-width="1.8" fill="none"/>
+                <path d="M37 54L40 61L43 54Z" fill="#1f2937"/>
+                <rect x="23" y="18" width="34" height="10" rx="2" fill="url(#goldCrown)" stroke="#78350f" stroke-width="1"/>
+                <rect x="13" y="12" width="54" height="6.5" rx="2" fill="#1f2937" stroke="#f6dc82" stroke-width="1.5"/>
+                <g stroke="#f6dc82" stroke-width="1.4" stroke-linecap="round">
+                    <line x1="18" y1="18.5" x2="18" y2="29"/><line x1="25" y1="18.5" x2="25" y2="29"/>
+                    <line x1="33" y1="18.5" x2="33" y2="29"/><line x1="40" y1="18.5" x2="40" y2="29"/>
+                    <line x1="47" y1="18.5" x2="47" y2="29"/><line x1="55" y1="18.5" x2="55" y2="29"/>
+                    <line x1="62" y1="18.5" x2="62" y2="29"/>
+                </g>
+                <g fill="#fef08a">
+                    <circle cx="18" cy="29" r="1.4"/><circle cx="25" cy="29" r="1.4"/><circle cx="33" cy="29" r="1.4"/>
+                    <circle cx="40" cy="29" r="1.4"/><circle cx="47" cy="29" r="1.4"/><circle cx="55" cy="29" r="1.4"/><circle cx="62" cy="29" r="1.4"/>
+                </g>
+            </svg>`
+        };
+
+        const STAGE_ORDER = ['read', 'idiom', 'seal', 'oracle', 'emperor'];
+        const LEVELS = {
+            read: {
+                idx: 1, name: '字音初試', game: '御前字音初試', icon: '📖', label: '📖 第一關・字音初試', examiner: '縣令老夫子',
+                intro: '本關專考日常極易念錯的破音字與三疊字魔王題，看看你是不是積非成是的文盲！',
+                idle: '「莫做積非成是的文盲，仔細瞧好這題！」',
+                ok: ['「嗯！這字念得頗有書卷氣！」', '「不錯，沒白費老夫子一番苦心。」', '「正是此音！看來平時有用功。」'],
+                combo: ['「連對這許多題，莫非是神童轉世？」', '「妙極！本縣今年就指望你高中了！」'],
+                bad: ['「哎呀！這也能念錯，快罰抄十遍！」', '「這可是日常常用字啊，莫當文盲！」', '「戒尺拿來！手心伸出來！」'],
+                bg: 'from-[#f6dc82] to-[#c99b2c] text-red-950 border-[#8c6411]'
+            },
+            idiom: {
+                idx: 2, name: '成語會試', game: '御前成語會試', icon: '🏮', label: '🏮 第二關・成語會試', examiner: '禮部侍郎',
+                intro: '本關測驗經典成語中「紅字」的標準讀音，一字念錯，整句文章可就失色囉！',
+                idle: '「成語一字錯，文章便失色，請細辨紅字。」',
+                ok: ['「妙哉！深諳典故正音，禮部需要你。」', '「出口成章，字正腔圓！」', '「好功底！此成語連舉人都常念錯。」'],
+                combo: ['「才思敏捷！本官看你已是進士之姿！」', '「口若懸河，字字珠璣！」'],
+                bad: ['「一字念錯，整句成語都變味啦！」', '「讀書人怎可如此馬虎？快翻辭典！」', '「這般讀音，禮部大門你可進不去啊！」'],
+                bg: 'from-emerald-300 to-emerald-600 text-emerald-950 border-emerald-800'
+            },
+            seal: {
+                idx: 3, name: '小篆銘文', game: '御前小篆銘文', icon: '🏺', label: '🏺 第三關・小篆銘文', examiner: '太史令',
+                intro: '本關呈現秦漢青銅器上的「小篆」古文字，每題限時 15 秒，考驗你的造字結構眼力！',
+                idle: '「青銅鼎上千年銘文，可認得此字？」',
+                ok: ['「博古通今！連秦代小篆都難不倒你。」', '「好眼力！千年銘文竟一眼看破。」', '「斯文未喪，太史令甚感欣慰！」'],
+                combo: ['「神了！莫非你曾與李斯同朝為官？」', '「古韻猶存，此等眼力世間罕見！」'],
+                bad: ['「這筆畫寫得這般明白，怎還猜錯？」', '「唉，古人造字之巧思全沒看懂啊！」', '「青銅鼎都要氣得冒煙了！」'],
+                bg: 'from-red-500 to-red-800 text-amber-50 border-red-950'
+            },
+            oracle: {
+                idx: 4, name: '甲骨卜辭', game: '御前甲骨卜辭', icon: '🦴', label: '🦴 第四關・甲骨卜辭', examiner: '商代大貞人',
+                intro: '本關展現三千年前商代龜甲上的「甲骨文」象形文字，每題限時 15 秒，唯有通靈眼力能過關！',
+                idle: '「龜甲刻辭通天地，請辨其為何字！」',
+                ok: ['「龜甲顯靈！天意與你相通！」', '「神機妙算！商王都要重用你。」', '「果然有靈氣，連卜辭都看得懂！」'],
+                combo: ['「天選之人！龜甲上的神諭全被你解開了！」', '「大吉大利！卜辭之道已入化境！」'],
+                bad: ['「龜殼都要裂錯邊了！再仔細端詳！」', '「天機不可洩漏，可惜你全猜偏了！」', '「這象形畫得這麼像，你竟不識？」'],
+                bg: 'from-amber-700 to-amber-900 text-amber-50 border-stone-950'
+            },
+            emperor: {
+                idx: 5, name: '皇帝殿試', game: '御前皇帝殿試', icon: '👑', label: '👑 第五關・皇帝殿試', examiner: '當朝聖上',
+                intro: '朕親自出題！匯集歷代古地名、複姓與各關魔王題，每題限時 12 秒，過關即封當朝狀元！',
+                idle: '「朕親自出題，爾等莫要貽笑大方！」',
+                ok: ['「龍心大悅！頗有當朝狀元之風！」', '「好！這般才學，朕甚是滿意！」', '「愛卿果然名不虛傳，重重有賞！」'],
+                combo: ['「文曲星下凡無誤！朕備好狀元袍了！」', '「連朕出的題都難不倒你，奇才啊！」'],
+                bad: ['「大膽！竟敢在朕面前胡亂念字！」', '「來人啊！拖出去國子監重讀三年！」', '「就這點墨水還想當狀元？笑話！」'],
+                bg: 'from-amber-300 via-yellow-400 to-amber-500 text-red-950 border-amber-700'
+            },
+            review: {
+                idx: 0, name: '錯題溫習', game: '御批錯題溫習', icon: '📝', label: '📝 御批錯題', examiner: '翰林院教諭',
+                intro: '這裡收錄了你先前答錯的題目，答對後便會從錯題策中消除！',
+                idle: '「溫故而知新，這次務必全數答對！」',
+                ok: ['「知錯能改，善莫大焉！」'], combo: ['「進步神速！刮目相看！」'], bad: ['「怎又錯了？快拿硃筆記下來！」']
+            }
+        };
+
+        const pickQuote = arr => arr[Math.floor(Math.random() * arr.length)];
+        const totalBankCount = originalQuestions.length + rareQuestions.length + idiomQuestions.length + GLYPH_BANK.seal.length + GLYPH_BANK.oracle.length + emperorQuestions.length;
+        const bankEl = document.getElementById('bank-count');
+        if (bankEl) bankEl.innerText = totalBankCount;
+
+        const AD_LINK = "https://uplcm.com/4/12128613";
+        const QUIZ_LEN = 10, RARE_PER_GAME = 3;
+        const SAVE_KEY = 'palace_quiz_save_v1';
+        const UNLOCK_KEY = 'palace_unlocked_stage_v1';
+
+        // ----------------------------------------------------
+        // 3. 瀏覽器偵測 & 外開輔助
+        // ----------------------------------------------------
+        const ua = navigator.userAgent || '';
+        if (/Line\/|Threads|Barcelona|Instagram|FBAN|FBAV|MicroMessenger/i.test(ua)) {
+            document.getElementById('inapp-warning').classList.remove('hidden');
+        }
+        function openBrowserHelper() { document.getElementById('browser-modal').classList.remove('hidden'); }
+        function closeBrowserHelper() { document.getElementById('browser-modal').classList.add('hidden'); }
+        function tryLineExternalRedirect() {
+            const url = location.href.split('?')[0];
+            if (/Line\//i.test(ua)) location.href = url + '?openExternalBrowser=1';
+            else copyGameUrl();
+        }
+        function copyGameUrl() {
+            navigator.clipboard?.writeText(location.href).then(() => {
+                showToast('網址已複製！請貼至 Safari 或 Chrome 開啟');
+                closeBrowserHelper();
+            }).catch(() => showToast('請點右上角「⋯」選擇以預設瀏覽器開啟'));
+        }
+
+        // ----------------------------------------------------
+        // 4. 中國古典音樂引擎：《每日一字》序曲 + 宮廷雅樂
+        // ----------------------------------------------------
+        let audioCtx = null, masterGain = null, bgmGain = null, sfxGain = null;
+        let muted = false, bgmEnabled = true, bgmTimer = null, bgmStep = 0, bgmScene = 'cover';
+
+        const NOTES = {
+            C3:130.81, D3:146.83, E3:164.81, G3:196.00, A3:220.00,
+            C4:261.63, D4:293.66, E4:329.63, G4:392.00, A4:440.00,
+            C5:523.25, D5:587.33, E5:659.25, G5:783.99, A5:880.00, C6:1046.50
+        };
+        const COVER_SCORE = [
+            ['G5','C4'],['E5',null],['G5','G4'],['A5',null],['G5','E4'],['E5',null],['D5','G3'],['C5',null],
+            ['D5','D4'],['E5',null],['G5','A3'],['E5',null],['D5','G3'],['C5',null],['A4','G3'],['G4',null],
+            ['A4','A3'],['C5',null],['D5','G3'],['E5',null],['G5','C4'],['A5',null],['C6','G4'],['A5',null],
+            ['G5','E4'],['E5',null],['D5','G3'],['E5',null],['C5','C4'],[null,'G3'],['C5','C4'],[null,null]
+        ];
+        const GAME_SCORE = [
+            ['E5','A3','E4'],[null,null,null],['G5','E4',null],['E5',null,null],['D5','D4','D5'],[null,null,null],['C5','A3',null],['A4',null,null],
+            ['C5','C4','C5'],[null,null,null],['D5','G3',null],['E5',null,null],['D5','G3','G4'],[null,null,null],['C5',null,null],['A4',null,null],
+            ['G4','E3','G4'],['A4',null,null],['C5','A3',null],['D5',null,null],['E5','C4','E5'],[null,null,null],['G5','G3',null],['A5',null,null],
+            ['G5','E4','G5'],[null,null,null],['E5','A3',null],['D5',null,null],['C5','G3','C5'],[null,null,null],['A4','A3',null],[null,null,null]
+        ];
+        // 皇帝殿試專屬配樂（莊嚴編鐘＋古箏＋長笛）
+        const EMPEROR_SCORE = [
+            ['C5','C3','G4'],[null,null,null],['D5','G3',null],['E5',null,null],['G5','C4','E5'],[null,null,null],['A5','A3',null],['G5',null,null],
+            ['E5','E3','C5'],[null,null,null],['D5','G3',null],['C5',null,null],['D5','D3','A4'],[null,null,null],['E5',null,null],[null,null,null],
+            ['G5','G3','G5'],[null,null,null],['A5','E4',null],['C6',null,null],['A5','A3','E5'],[null,null,null],['G5','G3',null],['E5',null,null],
+            ['D5','D4','D5'],[null,null,null],['E5','G3',null],['D5',null,null],['C5','C3','C5'],[null,null,null],[null,'G3',null],[null,null,null]
+        ];
+        // 皇帝面試過關欽定狀元專屬慶賀樂（歡騰柳琴＋編鐘＋古箏）
+        const EMPEROR_WIN_SCORE = [
+            ['C5','C4','G4'],['E5',null,null],['G5','G4','C5'],['C6',null,null],['A5','A3','E5'],['G5',null,null],['E5','C4',null],['G5',null,null],
+            ['A5','D4','A4'],['C6',null,null],['A5','G3','D5'],['G5',null,null],['E5','C4','E5'],['D5',null,null],['C5','G3',null],[null,null,null],
+            ['G5','E4','G5'],['A5',null,null],['C6','C4','C6'],['A5',null,null],['G5','G3','G5'],['E5',null,null],['D5','D4',null],['E5',null,null],
+            ['G5','C4','C5'],['A5',null,null],['C6','G4','G5'],[null,null,null],['C6','C4','C6'],[null,null,null],['G5','G3',null],[null,null,null]
+        ];
+
+        function initAudio() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    masterGain = audioCtx.createGain();
+                    bgmGain = audioCtx.createGain(); sfxGain = audioCtx.createGain();
+                    bgmGain.gain.value = bgmEnabled ? 0.34 : 0;
+                    sfxGain.gain.value = muted ? 0 : 0.9;
+                    bgmGain.connect(masterGain); sfxGain.connect(masterGain); masterGain.connect(audioCtx.destination);
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                if (bgmEnabled && !bgmTimer) startBgmLoop();
+            } catch (e) {}
+        }
+        function playLiuqin(freq, delay = 0, dur = 0.42, vol = 0.22) {
+            if (!audioCtx || !freq || !bgmGain) return;
+            const now = audioCtx.currentTime + delay;
+            const o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator(), f = audioCtx.createBiquadFilter(), g = audioCtx.createGain();
+            o1.type = 'sawtooth'; o2.type = 'triangle';
+            o1.frequency.setValueAtTime(freq, now); o2.frequency.setValueAtTime(freq * 2, now);
+            f.type = 'bandpass'; f.frequency.setValueAtTime(freq * 2.2, now); f.Q.value = 1.6;
+            g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(vol, now + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+            o1.connect(f); o2.connect(f); f.connect(g); g.connect(bgmGain);
+            o1.start(now); o2.start(now); o1.stop(now + dur + 0.04); o2.stop(now + dur + 0.04);
+        }
+        function playGuzheng(freq, delay = 0, dur = 1.4, vol = 0.2) {
+            if (!audioCtx || !freq || !bgmGain) return;
+            const now = audioCtx.currentTime + delay;
+            const o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator(), f = audioCtx.createBiquadFilter(), g = audioCtx.createGain();
+            o1.type = 'triangle'; o2.type = 'sine';
+            o1.frequency.setValueAtTime(freq, now); o2.frequency.setValueAtTime(freq * 2, now);
+            f.type = 'lowpass'; f.frequency.setValueAtTime(Math.min(freq * 5, 4200), now); f.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.3, 300), now + dur * 0.65);
+            g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(vol, now + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+            o1.connect(f); o2.connect(f); f.connect(g); g.connect(bgmGain);
+            o1.start(now); o2.start(now); o1.stop(now + dur + 0.05); o2.stop(now + dur + 0.05);
+        }
+        function playDizi(freq, delay = 0, dur = 1.1, vol = 0.085) {
+            if (!audioCtx || !freq || !bgmGain) return;
+            const now = audioCtx.currentTime + delay;
+            const o = audioCtx.createOscillator(), lfo = audioCtx.createOscillator(), lg = audioCtx.createGain(), g = audioCtx.createGain();
+            o.type = 'sine'; o.frequency.setValueAtTime(freq, now);
+            lfo.frequency.value = 5.2; lg.gain.value = 4.5; lfo.connect(lg); lg.connect(o.frequency);
+            g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(vol, now + 0.14); g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+            o.connect(g); g.connect(bgmGain);
+            o.start(now); lfo.start(now); o.stop(now + dur + 0.05); lfo.stop(now + dur + 0.05);
+        }
+        function playMuyu(delay = 0, vol = 0.06) {
+            if (!audioCtx || !bgmGain) return;
+            const now = audioCtx.currentTime + delay;
+            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o.type = 'sine'; o.frequency.setValueAtTime(620, now); o.frequency.exponentialRampToValueAtTime(340, now + 0.055);
+            g.gain.setValueAtTime(vol, now); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+            o.connect(g); g.connect(bgmGain); o.start(now); o.stop(now + 0.1);
+        }
+        function playBell(freq, delay = 0, dur = 1.6, vol = 0.16) {
+            if (!audioCtx || !freq || !bgmGain) return;
+            const now = audioCtx.currentTime + delay;
+            const o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o1.type = 'sine'; o2.type = 'triangle';
+            o1.frequency.setValueAtTime(freq, now); o2.frequency.setValueAtTime(freq * 1.5, now);
+            g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(vol, now + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+            o1.connect(g); o2.connect(g); g.connect(bgmGain);
+            o1.start(now); o2.start(now); o1.stop(now + dur + 0.05); o2.stop(now + dur + 0.05);
+        }
+        function startBgmLoop() {
+            if (bgmTimer) clearInterval(bgmTimer);
+            const tempo = bgmScene === 'cover' ? 225 : (bgmScene === 'emperorWin' ? 250 : (bgmScene === 'emperor' ? 320 : 360));
+            bgmTimer = setInterval(() => {
+                if (!audioCtx || !bgmEnabled || audioCtx.state !== 'running') return;
+                if (bgmScene === 'cover') {
+                    const [mel, bass] = COVER_SCORE[bgmStep % COVER_SCORE.length];
+                    if (mel && NOTES[mel]) playLiuqin(NOTES[mel], 0, 0.42, 0.24);
+                    if (bass && NOTES[bass]) playGuzheng(NOTES[bass], 0, 0.9, 0.14);
+                    if (bgmStep % 4 === 0) playMuyu(0, 0.05);
+                } else if (bgmScene === 'emperor') {
+                    const [mel, bass, flute] = EMPEROR_SCORE[bgmStep % EMPEROR_SCORE.length];
+                    if (mel && NOTES[mel]) playBell(NOTES[mel], 0, 1.45, 0.17);
+                    if (bass && NOTES[bass]) playGuzheng(NOTES[bass], 0, 1.9, 0.15);
+                    if (flute && NOTES[flute]) playDizi(NOTES[flute], 0.04, 1.25, 0.09);
+                    if (bgmStep % 4 === 0) playMuyu(0, 0.055);
+                } else if (bgmScene === 'emperorWin') {
+                    const [mel, bass, flute] = EMPEROR_WIN_SCORE[bgmStep % EMPEROR_WIN_SCORE.length];
+                    if (mel && NOTES[mel]) playLiuqin(NOTES[mel], 0, 0.55, 0.24);
+                    if (bass && NOTES[bass]) playBell(NOTES[bass], 0, 1.3, 0.15);
+                    if (flute && NOTES[flute]) playDizi(NOTES[flute], 0.02, 0.95, 0.09);
+                    if (bgmStep % 2 === 0) playMuyu(0, 0.04);
+                } else {
+                    const [mel, bass, flute] = GAME_SCORE[bgmStep % GAME_SCORE.length];
+                    if (mel && NOTES[mel]) playGuzheng(NOTES[mel], 0, 1.4, 0.2);
+                    if (bass && NOTES[bass]) playGuzheng(NOTES[bass], 0.02, 1.8, 0.12);
+                    if (flute && NOTES[flute]) playDizi(NOTES[flute], 0.04, 1.15, 0.08);
+                    if (bgmStep % 4 === 0) playMuyu(0, 0.045);
+                }
+                bgmStep++;
+            }, tempo);
+        }
+        function switchBgmScene(scene) {
+            if (bgmScene === scene && bgmTimer) return;
+            bgmScene = scene; bgmStep = 0;
+            if (bgmTimer) { clearInterval(bgmTimer); bgmTimer = null; }
+            if (audioCtx && bgmEnabled) startBgmLoop();
+        }
+        function playCoverPreview() { initAudio(); switchBgmScene('cover'); sfx.click(); }
+
+        function playChime(freq, delay = 0, dur = 0.65, vol = 0.22) {
+            if (!audioCtx || muted) return;
+            const now = audioCtx.currentTime + delay;
+            const o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator(), g = audioCtx.createGain();
+            o1.type = 'sine'; o2.type = 'triangle';
+            o1.frequency.setValueAtTime(freq, now); o2.frequency.setValueAtTime(freq * 2, now);
+            g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(vol, now + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+            o1.connect(g); o2.connect(g); g.connect(sfxGain);
+            o1.start(now); o2.start(now); o1.stop(now + dur + 0.05); o2.stop(now + dur + 0.05);
+        }
+        function playWrongGong(delay = 0) {
+            if (!audioCtx || muted) return;
+            const now = audioCtx.currentTime + delay;
+            const o = audioCtx.createOscillator(), o2 = audioCtx.createOscillator(), lp = audioCtx.createBiquadFilter(), g = audioCtx.createGain();
+            o.type = 'triangle'; o2.type = 'sawtooth';
+            o.frequency.setValueAtTime(196, now); o.frequency.exponentialRampToValueAtTime(88, now + 0.42);
+            o2.frequency.setValueAtTime(147, now); o2.frequency.exponentialRampToValueAtTime(65, now + 0.42);
+            lp.type = 'lowpass'; lp.frequency.value = 620;
+            g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.28, now + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
+            o.connect(lp); o2.connect(lp); lp.connect(g); g.connect(sfxGain);
+            o.start(now); o2.start(now); o.stop(now + 0.5); o2.stop(now + 0.5);
+        }
+        const sfx = {
+            click()   { playChime(880, 0, 0.08, 0.1); },
+            tick()    { playChime(1046.5, 0, 0.06, 0.08); },
+            correct() { playChime(587.33, 0, 0.35, 0.24); playChime(880, 0.09, 0.55, 0.26); },
+            combo(n)  { const sc = [523.25, 587.33, 659.25, 783.99, 880, 1046.5]; const idx = Math.min(n - 2, sc.length - 3); [sc[idx], sc[idx+1], sc[idx+2]].forEach((f, i) => playChime(f, i * 0.07, 0.45, 0.22)); },
+            wrong()   { playWrongGong(0); },
+            win()       { [523.25, 659.25, 783.99, 880, 1046.5].forEach((f, i) => playChime(f, i * 0.11, 0.6, 0.24)); },
+            emperorWin(){ [261.63, 392.00, 523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f, i) => playChime(f, i * 0.09, 0.95, 0.28)); },
+            lose()      { [329.63, 293.66, 246.94, 196.00].forEach((f, i) => playWrongGong(i * 0.18)); }
+        };
+        function updateAudioButtons() {
+            document.getElementById('mute-btn').innerText = muted ? '🔇' : '🔊';
+            document.getElementById('bgm-btn').innerText = bgmEnabled ? '🎵' : '🎶';
+            document.getElementById('bgm-btn').style.opacity = bgmEnabled ? '1' : '0.45';
+            document.getElementById('start-sfx-btn').innerText = muted ? '🔊 音：關' : '🔊 音：開';
+            document.getElementById('start-bgm-btn').innerText = bgmEnabled ? '🎵 雅樂：開' : '🎵 雅樂：關';
+        }
+        function toggleMute() { initAudio(); muted = !muted; if (sfxGain) sfxGain.gain.value = muted ? 0 : 0.9; updateAudioButtons(); if (!muted) sfx.click(); }
+        function toggleBgm() { initAudio(); bgmEnabled = !bgmEnabled; if (bgmGain) bgmGain.gain.setTargetAtTime(bgmEnabled ? 0.34 : 0, audioCtx.currentTime, 0.08); updateAudioButtons(); if (!muted) sfx.click(); }
+
+        // ----------------------------------------------------
+        // 5. 破關解鎖制、自動存檔 & 關卡選單渲染
+        // ----------------------------------------------------
+        let gameMode = 'standard', currentLevel = 'read';
+        let questions = [], endlessPool = [], currentQuestionIndex = 0;
+        let score = 0, correctCount = 0, streak = 0, lives = 3, maxLives = 3;
+        let resultHistory = [], wrongList = [], lastRank = null;
+        let isAnswering = false, hint5050Left = 1, timerId = null;
+
+        const getUnlockedStage = () => { try { return Math.max(1, Math.min(5, +localStorage.getItem(UNLOCK_KEY) || 1)); } catch (e) { return 1; } };
+        const setUnlockedStage = n => { try { localStorage.setItem(UNLOCK_KEY, Math.max(getUnlockedStage(), Math.min(5, n))); } catch (e) {} };
+        const getBest = l => { try { return +localStorage.getItem('best_' + (l || currentLevel)) || 0; } catch (e) { return 0; } };
+        const setBest = v => { try { localStorage.setItem('best_' + currentLevel, v); } catch (e) {} };
+        const getSavedWrongs = () => { try { return JSON.parse(localStorage.getItem('wrong_bank_v1') || '[]'); } catch (e) { return []; } };
+        const saveSavedWrongs = arr => { try { localStorage.setItem('wrong_bank_v1', JSON.stringify(arr.slice(0, 40))); } catch (e) {} };
+
+        function renderStageCards() {
+            const unlocked = getUnlockedStage();
+            const counts = {
+                read: originalQuestions.length + rareQuestions.length,
+                idiom: idiomQuestions.length,
+                seal: GLYPH_BANK.seal.length,
+                oracle: GLYPH_BANK.oracle.length,
+                emperor: emperorQuestions.length
+            };
+            const grid = document.getElementById('stage-grid');
+            grid.innerHTML = ['read', 'idiom', 'seal', 'oracle'].map(key => {
+                const lv = LEVELS[key], isLocked = lv.idx > unlocked, isCleared = lv.idx < unlocked;
+                const cardCls = isLocked
+                    ? 'bg-[#362722]/90 border-[#6e5648] text-stone-300 opacity-80'
+                    : isCleared
+                        ? 'bg-gradient-to-b from-[#fdedb3] to-[#dfb147] border-[#9a6b12] text-red-950 shadow-md'
+                        : 'bg-gradient-to-b from-[#74f0c5] to-[#1ca37f] border-[#065f46] text-emerald-950 shadow-md';
+                const badge = isLocked
+                    ? '<span class="w-5 h-5 rounded-full bg-black/45 text-stone-300 inline-flex items-center justify-center text-[10px]">🔒</span>'
+                    : isCleared
+                        ? '<span class="w-5 h-5 rounded-full bg-emerald-600 text-white inline-flex items-center justify-center text-[10px] font-black shadow">✓</span>'
+                        : `<span class="px-1.5 py-0.5 rounded-full bg-black/20 text-emerald-950 font-black text-[10px]">${counts[key]}題</span>`;
+                const scrollBadgeCls = isLocked
+                    ? 'bg-black/25 border-stone-500/50 text-stone-300'
+                    : 'bg-[#fdf6e2] border-[#b9831a] text-stone-900 shadow-sm';
+                return `
+                    <button onclick="tryStartStage('${key}')" class="btn-press ${cardCls} rounded-xl p-2 border-2 text-left flex flex-col gap-1.5 relative overflow-hidden">
+                        <div class="flex justify-between items-center w-full">
+                            <span class="text-xs font-black truncate">第${lv.idx}關・${lv.examiner}</span>
+                            ${badge}
+                        </div>
+                        <div class="flex items-center gap-2 w-full">
+                            <div class="w-12 h-12 rounded-full overflow-hidden border-2 ${isLocked ? 'border-stone-500 grayscale' : 'border-[#854d0e] bg-amber-50'} shrink-0 shadow-sm">${EXAMINER_SVGS[key]}</div>
+                            <div class="flex-1 min-w-0 border ${scrollBadgeCls} rounded-lg px-1.5 py-1.5 text-xs font-black truncate text-center">${lv.icon} ${lv.name}</div>
+                        </div>
+                    </button>`;
+            }).join('');
+
+            const empLocked = 5 > unlocked;
+            const empBtn = document.getElementById('stage-btn-emperor');
+            empBtn.className = `btn-press w-full rounded-xl p-2.5 shadow-lg border-2 flex items-center justify-between text-left transition ${empLocked ? 'bg-[#362722]/90 border-[#6e5648] text-amber-100/85' : 'bg-gradient-to-r from-[#fce694] via-[#e5b94c] to-[#d4af37] border-[#fef08a] text-red-950'}`;
+            empBtn.innerHTML = `
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-12 h-12 rounded-full overflow-hidden border-2 ${empLocked ? 'border-[#b9831a] bg-[#241612]' : 'border-[#7c1919] bg-amber-50'} shrink-0 shadow flex items-center justify-center">
+                        ${empLocked ? '<span class="text-2xl">👑</span>' : EXAMINER_SVGS.emperor}
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-sm font-black truncate">第五關・皇帝殿試（御前親試）</div>
+                        <div class="text-[11px] opacity-90 truncate">${empLocked ? '🔒 需先通關前四關方可面聖' : `聖上親臨出題・御製 ${counts.emperor} 題＋前四關菁英`}</div>
+                    </div>
+                </div>
+                <span class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs font-black ${empLocked ? 'bg-black/40 border border-stone-500/60 text-amber-200' : 'bg-[#7c1919] text-[#f6dc82] px-2.5 w-auto rounded-lg'}">${empLocked ? '🔒' : '面聖 →'}</span>`;
+        }
+
+        function tryStartStage(key) {
+            const lv = LEVELS[key];
+            if (lv.idx > getUnlockedStage()) {
+                initAudio(); sfx.wrong();
+                showToast(`請先通關第 ${lv.idx - 1} 關（答對 6 題）即可解鎖！`);
+                return;
+            }
+            startGame(key);
+        }
+
+        function saveProgress() {
+            try {
+                localStorage.setItem(SAVE_KEY, JSON.stringify({
+                    gameMode, currentLevel, questions, endlessPool, currentQuestionIndex,
+                    score, correctCount, streak, lives, hint5050Left, resultHistory, wrongList, ts: Date.now()
+                }));
+            } catch (e) {}
+        }
+        function clearSavedProgress() { try { localStorage.removeItem(SAVE_KEY); } catch (e) {} }
+        function checkSavedProgress() {
+            try {
+                const raw = localStorage.getItem(SAVE_KEY);
+                if (!raw) { document.getElementById('resume-card').classList.add('hidden'); return; }
+                const d = JSON.parse(raw);
+                if (!d || !d.questions || !d.questions.length || Date.now() - d.ts > 86400000) {
+                    clearSavedProgress(); document.getElementById('resume-card').classList.add('hidden'); return;
+                }
+                const lv = LEVELS[d.currentLevel] || LEVELS.read;
+                document.getElementById('resume-info').innerText = `${lv.label}・第 ${d.currentQuestionIndex + 1} 題・${d.score} 分・${'❤️'.repeat(Math.max(0, d.lives))}`;
+                document.getElementById('resume-card').classList.remove('hidden');
+            } catch (e) { document.getElementById('resume-card').classList.add('hidden'); }
+        }
+        function resumeSavedGame() {
+            try {
+                const d = JSON.parse(localStorage.getItem(SAVE_KEY));
+                if (!d) return;
+                initAudio(); sfx.click();
+                ({ gameMode, currentLevel, questions, endlessPool, currentQuestionIndex, score, correctCount, streak, lives, hint5050Left, resultHistory, wrongList } = d);
+                switchBgmScene(currentLevel === 'emperor' ? 'emperor' : 'game');
+                if (lives <= 0) lives = 1;
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('game-over-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                document.getElementById('home-btn').classList.remove('hidden');
+                document.getElementById('intro-overlay').classList.add('hidden');
+                setupExaminerUI();
+                updateUI(); loadQuestion();
+            } catch (e) {}
+        }
+        function discardSavedGame() { clearSavedProgress(); checkSavedProgress(); initAudio(); sfx.click(); }
+
+        const PLAYER_NAME_KEY = 'palace_player_name_v1';
+        const getPlayerName = () => { try { return (localStorage.getItem(PLAYER_NAME_KEY) || '').trim() || '無名舉子'; } catch (e) { return '無名舉子'; } };
+        function savePlayerName(v) { try { localStorage.setItem(PLAYER_NAME_KEY, v.trim()); } catch (e) {} }
+
+        function refreshBest() {
+            const nameInput = document.getElementById('player-name-input');
+            if (nameInput && !nameInput.value) {
+                try { nameInput.value = localStorage.getItem(PLAYER_NAME_KEY) || ''; } catch (e) {}
+            }
+            renderStageCards();
+            const t = STAGE_ORDER.filter(k => getBest(k)).map(k => LEVELS[k].icon + getBest(k)).join(' ');
+            document.getElementById('best-start').innerText = t || '尚無紀錄';
+            const sw = getSavedWrongs();
+            document.getElementById('saved-wrong-count').innerText = sw.length;
+            document.getElementById('review-btn').classList.toggle('hidden', sw.length === 0);
+            checkSavedProgress();
+        }
+        refreshBest();
+
+        function setMode(m) {
+            gameMode = m; initAudio(); sfx.click();
+            const std = document.getElementById('mode-standard'), end = document.getElementById('mode-endless');
+            if (m === 'standard') {
+                std.className = 'flex-1 py-1 text-xs font-black rounded-full bg-gradient-to-b from-[#fce694] to-[#cfa12e] text-red-950 shadow';
+                end.className = 'flex-1 py-1 text-xs font-bold rounded-full text-amber-100 hover:bg-white/10';
+            } else {
+                end.className = 'flex-1 py-1 text-xs font-black rounded-full bg-gradient-to-b from-[#fce694] to-[#cfa12e] text-red-950 shadow';
+                std.className = 'flex-1 py-1 text-xs font-bold rounded-full text-amber-100 hover:bg-white/10';
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function buildPoolForLevel(level) {
+            if (level === 'idiom') return shuffleArray([...idiomQuestions]);
+            if (level === 'seal' || level === 'oracle') return shuffleArray([...GLYPH_BANK[level]]);
+            if (level === 'review') return shuffleArray([...getSavedWrongs()]);
+            if (level === 'emperor') {
+                const emp = shuffleArray([...emperorQuestions]).slice(0, 6);
+                const mix = shuffleArray([...rareQuestions, ...idiomQuestions, ...GLYPH_BANK.seal, ...GLYPH_BANK.oracle]).slice(0, 4);
+                return shuffleArray([...emp, ...mix]);
+            }
+            if (gameMode === 'endless') return shuffleArray([...originalQuestions, ...rareQuestions]);
+            return shuffleArray([
+                ...shuffleArray([...originalQuestions]).slice(0, QUIZ_LEN - RARE_PER_GAME),
+                ...shuffleArray([...rareQuestions]).slice(0, RARE_PER_GAME)
+            ]);
+        }
+
+        function setupExaminerUI() {
+            const lv = LEVELS[currentLevel] || LEVELS.read;
+            document.getElementById('level-badge').innerText = lv.label + (gameMode === 'endless' && currentLevel !== 'review' ? ' (無盡)' : '');
+            document.getElementById('examiner-avatar').innerHTML = EXAMINER_SVGS[currentLevel] || EXAMINER_SVGS.read;
+            document.getElementById('examiner-name').innerText = lv.examiner;
+            document.getElementById('examiner-quote').innerText = lv.idle;
+        }
+
+        function startGame(level = currentLevel) {
+            currentLevel = level;
+            initAudio(); sfx.click(); switchBgmScene(level === 'emperor' ? 'emperor' : 'game');
+            clearTimer();
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('home-btn').classList.remove('hidden');
+
+            const pool = buildPoolForLevel(level);
+            if (gameMode === 'endless' && level !== 'review') {
+                endlessPool = pool; questions = [endlessPool.pop()];
+            } else {
+                questions = level === 'review' ? pool : pool.slice(0, QUIZ_LEN);
+            }
+
+            currentQuestionIndex = 0; score = 0; correctCount = 0; streak = 0;
+            lives = maxLives; hint5050Left = gameMode === 'endless' ? 2 : 1;
+            resultHistory = []; wrongList = [];
+
+            setupExaminerUI();
+            updateUI();
+            showStageIntro();
+        }
+
+        // 開考前考官宣旨介紹關卡與晉級規則
+        function showStageIntro() {
+            const lv = LEVELS[currentLevel] || LEVELS.read;
+            document.getElementById('intro-stage-title').innerText = lv.label;
+            document.getElementById('intro-avatar').innerHTML = EXAMINER_SVGS[currentLevel] || EXAMINER_SVGS.read;
+            document.getElementById('intro-examiner').innerText = `主考官：${lv.examiner}`;
+            document.getElementById('intro-desc').innerText = lv.intro;
+            const totalQ = questions.length;
+            const needPass = currentLevel === 'review' ? totalQ : (gameMode === 'endless' ? 6 : Math.ceil(totalQ * 0.6));
+            document.getElementById('intro-rule').innerText = gameMode === 'endless' && currentLevel !== 'review'
+                ? `📜 晉級規則：共 3 顆愛心，答對 ${needPass} 題以上即過關晉級！`
+                : `📜 晉級規則：本關共 ${totalQ} 題（3 顆心），需答對 ${needPass} 題以上方可晉級下一關！`;
+            document.getElementById('intro-overlay').classList.remove('hidden');
+        }
+
+        function beginActualQuiz() {
+            initAudio(); sfx.click();
+            document.getElementById('intro-overlay').classList.add('hidden');
+            loadQuestion();
+        }
+
+        function startReviewMode() { if (getSavedWrongs().length) startGame('review'); }
+
+        // ----------------------------------------------------
+        // 6. 題目載入、計時與手動下一題
+        // ----------------------------------------------------
+        const clearTimer = () => clearInterval(timerId);
+        function startTimer(q) {
+            clearTimer();
+            const wrap = document.getElementById('timer-wrap'), bar = document.getElementById('timer-bar');
+            const timed = !!q.svg || gameMode === 'endless' || currentLevel === 'emperor';
+            wrap.classList.toggle('hidden', !timed);
+            if (!timed) return;
+            const total = q.svg ? 15000 : 12000, t0 = Date.now();
+            let lastSecTick = 4;
+            bar.style.width = '100%'; bar.style.background = '#d97706';
+            timerId = setInterval(() => {
+                const elapsed = Date.now() - t0, left = 1 - elapsed / total;
+                const secLeft = Math.ceil((total - elapsed) / 1000);
+                if (secLeft <= 3 && secLeft > 0 && secLeft < lastSecTick) { lastSecTick = secLeft; sfx.tick(); }
+                bar.style.width = Math.max(0, left * 100) + '%';
+                bar.style.background = left < .3 ? '#b91c1c' : '#d97706';
+                if (left <= 0) { clearTimer(); if (!isAnswering) checkAnswer('⏰', null, q.correct); }
+            }, 100);
+        }
+
+        function loadQuestion() {
+            isAnswering = false;
+            const q = questions[currentQuestionIndex];
+            saveProgress();
+            startTimer(q);
+
+            const lv = LEVELS[currentLevel] || LEVELS.read;
+            document.getElementById('examiner-quote').innerText = lv.idle;
+            document.getElementById('note-box').classList.add('hidden');
+            document.getElementById('lifeline-bar').classList.remove('hidden');
+
+            const rt = document.getElementById('rare-tag');
+            rt.classList.toggle('hidden', !q.rare);
+            rt.innerText = q.tag || '👹 殿試魔王題';
+
+            if (q.svg) {
+                document.getElementById('prompt-text').innerText = q.level === 'seal' ? '這件青銅器上刻的是哪個字？' : '這片龜甲上刻的是哪個字？';
+            } else if (q.isIdiom) {
+                document.getElementById('prompt-text').innerHTML = `請選出紅字「<span class="text-red-700">${q.word[q.targetIdx]}</span>」的正確讀音：`;
+            } else {
+                document.getElementById('prompt-text').innerText = '請選出正確的讀音：';
+            }
+
+            const isEndless = gameMode === 'endless' && currentLevel !== 'review';
+            document.getElementById('progress-bar').style.width = isEndless ? '100%' : ((currentQuestionIndex / questions.length) * 100) + '%';
+            document.getElementById('q-progress').innerText = isEndless ? `${currentQuestionIndex + 1} (無盡)` : `${currentQuestionIndex + 1}/${questions.length}`;
+
+            const wordContainer = document.getElementById('question-word');
+            wordContainer.innerHTML = '';
+            if (q.svg) {
+                const st = GLYPH_STYLE[q.level];
+                const g = (dy, col, w, op) => `<g transform="translate(37 ${37 + dy}) scale(1.26)" fill="none" stroke="${col}" stroke-opacity="${op}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${q.svg}</g>`;
+                wordContainer.innerHTML = `<div style="text-align:center"><svg viewBox="0 0 200 200" class="w-[155px] h-[155px] sm:w-[172px] sm:h-[172px]" style="filter:drop-shadow(0 5px 8px rgba(0,0,0,.32))">${BG[q.level]}${g(1.5, '#fff', st.sw + 0.6, .5)}${g(0, st.color, st.sw, 1)}</svg></div>`;
+            } else {
+                const chars = [...q.word];
+                const boxCls = chars.length >= 4 ? 'mizi-box sm-box' : (chars.length === 3 ? 'mizi-box md-box' : 'mizi-box');
+                chars.forEach((char, idx) => {
+                    const isTarget = q.isIdiom && idx === q.targetIdx;
+                    wordContainer.innerHTML += `<div class="${boxCls} ${isTarget ? 'target-box' : ''}"><div class="mizi-lines"></div><div class="mizi-text">${char}</div></div>`;
+                });
+            }
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            const labels = ['甲', '乙', '丙', '丁'];
+            shuffleArray([...q.options]).forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.style.animationDelay = (i * 35) + 'ms';
+                btn.dataset.opt = opt;
+                btn.className = "opt-in btn-press w-full bg-white border-2 border-[#d4af37]/80 rounded-xl py-2 px-3 text-lg sm:text-xl font-bold text-stone-800 shadow-sm hover:border-[#991b1b] hover:bg-amber-50 flex items-center justify-between";
+                btn.innerHTML = `<span class="w-6 h-6 rounded-full bg-amber-100 border border-[#d4af37] text-[#7c1919] text-xs font-bold flex items-center justify-center shrink-0">${labels[i]}</span><span class="flex-1 text-center tracking-wide">${opt}</span><span class="text-[10px] text-stone-400 font-sans w-4 text-right">${i + 1}</span>`;
+                btn.onclick = () => checkAnswer(opt, btn, q.correct);
+                optionsContainer.appendChild(btn);
+            });
+            updateHintButtons();
+        }
+
+        function updateHintButtons() {
+            const btn = document.getElementById('hint-5050-btn');
+            document.getElementById('hint-5050-count').innerText = hint5050Left;
+            btn.disabled = hint5050Left <= 0 || isAnswering;
+            btn.classList.toggle('opacity-40', hint5050Left <= 0);
+        }
+        function eliminateTwoWrongOptions() {
+            const q = questions[currentQuestionIndex];
+            const wrongBtns = shuffleArray([...document.getElementById('options-container').children].filter(b => b.dataset.opt !== q.correct && !b.classList.contains('opt-eliminated')));
+            if (!wrongBtns.length) return false;
+            wrongBtns.slice(0, 2).forEach(b => b.classList.add('opt-eliminated'));
+            return true;
+        }
+        function useEliminateHint() {
+            if (isAnswering || hint5050Left <= 0 || !eliminateTwoWrongOptions()) return;
+            hint5050Left--; initAudio(); sfx.click(); saveProgress(); updateHintButtons();
+        }
+        function watchAdForHelp() {
+            if (isAnswering) return;
+            saveProgress();
+            window.open(AD_LINK, '_blank');
+            setTimeout(() => {
+                if (!isAnswering && eliminateTwoWrongOptions()) {
+                    initAudio(); sfx.click(); showToast('已啟用廣告求救，刪去錯誤選項！');
+                }
+            }, 450);
+        }
+
+        function recordWrongToLocal(q) {
+            if (q.svg) return;
+            const saved = getSavedWrongs();
+            if (!saved.some(item => item.word === q.word && item.correct === q.correct)) { saved.unshift(q); saveSavedWrongs(saved); }
+        }
+        function removeWrongFromLocal(q) {
+            if (currentLevel !== 'review') return;
+            saveSavedWrongs(getSavedWrongs().filter(item => !(item.word === q.word && item.correct === q.correct)));
+        }
+
+        function checkAnswer(selectedOption, btnElement, correctOption) {
+            if (isAnswering) return;
+            isAnswering = true; clearTimer(); initAudio();
+
+            const cq = questions[currentQuestionIndex], isCorrect = selectedOption === correctOption;
+            const lv = LEVELS[currentLevel] || LEVELS.read;
+
+            if (isCorrect) {
+                btnElement?.classList.add('opt-correct');
+                correctCount++; streak++;
+                score += 10 + (streak >= 2 ? Math.min(streak * 2, 10) : 0);
+                streak >= 3 ? sfx.combo(streak) : sfx.correct();
+                resultHistory.push('🟩'); removeWrongFromLocal(cq);
+                showFeedback('⭕', 'text-emerald-600');
+                document.getElementById('examiner-quote').innerText = streak >= 3 && lv.combo ? pickQuote(lv.combo) : pickQuote(lv.ok);
+            } else {
+                btnElement?.classList.add('opt-wrong');
+                lives--; streak = 0; wrongList.push(cq); recordWrongToLocal(cq);
+                sfx.wrong(); if (navigator.vibrate) navigator.vibrate(200);
+                [...document.getElementById('options-container').children].forEach(b => { if (b.dataset.opt === correctOption) b.classList.add('opt-correct'); });
+                resultHistory.push('🟥');
+                showFeedback('❌', 'text-red-600');
+                document.getElementById('examiner-quote').innerText = pickQuote(lv.bad);
+                document.getElementById('game-container').classList.add('shake-animation');
+                setTimeout(() => document.getElementById('game-container').classList.remove('shake-animation'), 400);
+            }
+
+            updateUI(); saveProgress();
+
+            document.getElementById('lifeline-bar').classList.add('hidden');
+            const nb = document.getElementById('note-box');
+            const statusPrefix = isCorrect ? '<span class="text-emerald-700 font-bold">⭕ 答對！</span>' : `<span class="text-red-700 font-bold">❌ 正音「${cq.correct}」</span>`;
+            document.getElementById('note-content').innerHTML = `${statusPrefix} <b>${cq.word}</b>：${cq.note || '請牢記此字標準讀音。'}`;
+
+            const isLast = (lives <= 0) || (gameMode !== 'endless' && currentQuestionIndex >= questions.length - 1);
+            document.getElementById('next-btn').innerText = lives <= 0 ? '查看殿試榜單（可看廣告接關） →' : (isLast ? '揭曉殿試金榜 →' : '下一題 →');
+            nb.classList.remove('hidden');
+        }
+
+        function manualNext() {
+            if (!isAnswering) return;
+            sfx.click();
+            if (lives <= 0) { endGame(false); return; }
+            currentQuestionIndex++;
+            if (gameMode === 'endless' && currentLevel !== 'review') {
+                if (endlessPool.length === 0) endlessPool = buildPoolForLevel(currentLevel);
+                questions.push(endlessPool.pop()); loadQuestion();
+            } else if (currentQuestionIndex >= questions.length) {
+                endGame(true);
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function showFeedback(symbol, colorClass) {
+            const icon = document.getElementById('feedback-icon');
+            icon.innerText = symbol;
+            icon.className = `absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold z-30 pointer-events-none ${colorClass} transition-opacity duration-200`;
+            icon.style.opacity = '1'; icon.style.animation = 'none'; void icon.offsetWidth; icon.style.animation = 'pop .35s ease-out';
+            setTimeout(() => { icon.style.opacity = '0'; }, 600);
+        }
+
+        function updateUI() {
+            document.getElementById('score-display').innerText = `${score} 分`;
+            let hearts = '';
+            for (let i = 0; i < maxLives; i++) hearts += i < lives ? '❤️' : '🤍';
+            document.getElementById('lives-display').innerHTML = hearts;
+            document.getElementById('streak').innerText = streak >= 2 ? `🔥 連對 ${streak}` : '';
+        }
+
+        document.addEventListener('keydown', e => {
+            if (document.getElementById('game-screen').classList.contains('hidden')) return;
+            if (!document.getElementById('intro-overlay').classList.contains('hidden')) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); beginActualQuiz(); }
+                return;
+            }
+            if (['1', '2', '3', '4'].includes(e.key) && !isAnswering) {
+                const btn = [...document.getElementById('options-container').children][+e.key - 1];
+                if (btn && !btn.classList.contains('opt-eliminated')) btn.click();
+            } else if ((e.key === 'Enter' || e.key === ' ') && isAnswering) {
+                e.preventDefault(); manualNext();
+            }
+        });
+
+        // ----------------------------------------------------
+        // 7. 古典科舉金榜結算、破關解鎖 & 接關
+        // ----------------------------------------------------
+        const pctAccuracy = () => resultHistory.length ? (correctCount / resultHistory.length) * 100 : 0;
+        const wrongText = q => q.svg ? `${q.correct}（${q.name}）` : `${q.word} → ${q.correct}`;
+
+        function getRank(completed) {
+            const pct = pctAccuracy();
+            if (!completed && gameMode !== 'endless') return { grade: '落第', title: '御前落第！再接再厲', remark: '紅心已盡，可看廣告滿血接關，或回國子監重讀！', color: '#b91c1c' };
+            if (gameMode === 'endless') {
+                if (correctCount >= 25) return { grade: '狀元', title: '欽點當朝狀元', remark: `連闖 ${correctCount} 題，文曲星下凡無誤！`, color: '#b45309' };
+                if (correctCount >= 15) return { grade: '榜眼', title: '御前榜眼及第', remark: `答對 ${correctCount} 題！學富五車。`, color: '#15803d' };
+                if (correctCount >= 6)  return { grade: '探花', title: '翰林院探花', remark: `答對 ${correctCount} 題，表現不俗！`, color: '#15803d' };
+                return { grade: '舉人', title: '初試啼聲', remark: `答對 ${correctCount} 題，尚須勤讀詩書。`, color: '#ca8a04' };
+            }
+            if (pct >= 100) return { grade: '狀元', title: currentLevel === 'emperor' ? '御前欽點狀元' : '本關滿分狀元', remark: '一字不差！聖上龍心大悅，賜金花御酒！', color: '#b45309' };
+            if (pct >= 90)  return { grade: '榜眼', title: '殿試榜眼及第', remark: '才高八斗！僅差一步便奪狀元。', color: '#15803d' };
+            if (pct >= 80)  return { grade: '探花', title: '欽定探花郎', remark: '功力深厚，偶爾還是會被積非成是騙到。', color: '#15803d' };
+            if (pct >= 60)  return { grade: '進士', title: '勉為進士及第', remark: '及格過關！奉旨晉級下一關。', color: '#ca8a04' };
+            return { grade: '落第', title: '名落孫山', remark: '未達 60% 及格線，請再重試本關！', color: '#b91c1c' };
+        }
+
+        function endGame(completed) {
+            clearTimer();
+            if (completed) clearSavedProgress();
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            document.getElementById('home-btn').classList.add('hidden');
+
+            const r = lastRank = getRank(completed);
+            const pass = (completed && pctAccuracy() >= 60) || (gameMode === 'endless' && correctCount >= 6);
+            const isEmperorPass = currentLevel === 'emperor' && pass;
+            if (isEmperorPass) {
+                sfx.emperorWin();
+                switchBgmScene('emperorWin');
+            } else {
+                pass ? sfx.win() : sfx.lose();
+            }
+            const goScreen = document.getElementById('game-over-screen');
+            goScreen.classList.toggle('emperor-pass-mode', isEmperorPass);
+            document.getElementById('emperor-crest').classList.toggle('hidden', !isEmperorPass);
+
+            const lvIdx = (LEVELS[currentLevel] || {}).idx || 0;
+            const prevUnlocked = getUnlockedStage();
+            let nextKey = null;
+            if (pass && lvIdx >= 1 && lvIdx < 5) {
+                nextKey = STAGE_ORDER[lvIdx];
+                if (lvIdx + 1 > prevUnlocked) setUnlockedStage(lvIdx + 1);
+            }
+
+            const unlockBanner = document.getElementById('unlock-banner');
+            const nextStageBtn = document.getElementById('next-stage-btn');
+            if (pass && nextKey) {
+                unlockBanner.innerText = `🎉 奉旨晉級！已解鎖「${LEVELS[nextKey].label}」`;
+                unlockBanner.classList.remove('hidden');
+                nextStageBtn.innerText = `➡️ 奉旨晉級：挑戰${LEVELS[nextKey].name}`;
+                nextStageBtn.dataset.nextKey = nextKey;
+                nextStageBtn.classList.remove('hidden');
+            } else if (pass && currentLevel === 'emperor') {
+                unlockBanner.innerText = '👑 恭喜通關全部五關！榮膺當朝欽定狀元！';
+                unlockBanner.classList.remove('hidden');
+                nextStageBtn.classList.add('hidden');
+            } else {
+                unlockBanner.classList.add('hidden');
+                nextStageBtn.classList.add('hidden');
+            }
+
+            document.getElementById('bang-big-title').innerText = isEmperorPass ? '欽定狀元' : (pass ? '金榜題名' : '放榜');
+            document.getElementById('bang-header').innerText = isEmperorPass ? '─── 🐉 御筆親批・獨占鰲頭 🐉 ───' : (pass ? '─── ○ 奉天承運・翰林院金榜題名 ○ ───' : '─── ○ 御前榜文・名落孫山 ○ ───');
+            document.getElementById('report-title').innerText = isEmperorPass ? '奉天承運・皇帝親擢金榜' : (LEVELS[currentLevel].name + (pass ? '・及第金榜' : '・落第榜文'));
+            document.getElementById('bang-player-name').innerText = getPlayerName();
+            document.getElementById('accuracy-badge').innerText = `答對 ${correctCount}/${resultHistory.length}`;
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('result-examiner-avatar').innerHTML = EXAMINER_SVGS[currentLevel] || EXAMINER_SVGS.read;
+            document.getElementById('result-emoji').innerHTML = resultHistory.slice(-10).map(h =>
+                h === '🟩'
+                    ? '<span class="inline-flex w-4 h-4 rounded-full bg-emerald-600 text-white items-center justify-center text-[10px] font-black shadow-sm">✓</span>'
+                    : '<span class="inline-flex w-4 h-4 rounded-full bg-red-600 text-white items-center justify-center text-[10px] font-black shadow-sm">✗</span>'
+            ).join('');
+            const t = document.getElementById('result-title'); t.innerText = r.title; t.style.color = r.color;
+            document.getElementById('result-remark').innerText = r.remark;
+            const st = document.getElementById('grade-stamp'); st.innerText = r.grade; st.style.color = r.color;
+            st.classList.remove('in'); void st.offsetWidth; st.classList.add('in');
+
+            document.getElementById('wrong-box').classList.toggle('hidden', wrongList.length === 0);
+            document.getElementById('perfect-box').classList.toggle('hidden', wrongList.length > 0);
+            document.getElementById('wrong-list').innerHTML = wrongList.slice(0, 2).map(q => `<div>${wrongText(q)}</div>`).join('');
+
+            const best = getBest(), isNew = score > best && score > 0;
+            if (isNew && currentLevel !== 'review') setBest(score);
+            document.getElementById('best-score').innerText = Math.max(best, score);
+            document.getElementById('record-tag').innerText = isNew && currentLevel !== 'review' ? '🎉 新紀錄！' : '';
+            refreshBest();
+
+            document.getElementById('revive-btn').style.display = completed ? 'none' : 'flex';
+            if (isEmperorPass) { confetti(); setTimeout(confetti, 450); }
+            else if ((completed && pctAccuracy() >= 80) || (gameMode === 'endless' && correctCount >= 15)) confetti();
+        }
+
+        function goToNextStage() {
+            const nextKey = document.getElementById('next-stage-btn').dataset.nextKey;
+            if (nextKey) startGame(nextKey);
+        }
+
+        function confetti() {
+            const c = document.createElement('canvas');
+            c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:100';
+            c.width = innerWidth; c.height = innerHeight; document.body.appendChild(c);
+            const x = c.getContext('2d'), cols = ['#f6dc82', '#ef4444', '#22c55e', '#3b82f6', '#f472b6'];
+            const p = Array.from({ length: 120 }, () => ({ x: Math.random() * c.width, y: -Math.random() * c.height * .6, vx: Math.random() * 4 - 2, vy: 2 + Math.random() * 4, s: 6 + Math.random() * 7, r: Math.random() * 6, col: cols[Math.random() * 5 | 0] }));
+            let n = 0;
+            (function f() {
+                x.clearRect(0, 0, c.width, c.height);
+                p.forEach(q => { q.x += q.vx; q.y += q.vy; q.r += .1; x.save(); x.translate(q.x, q.y); x.rotate(q.r); x.fillStyle = q.col; x.fillRect(-q.s / 2, -q.s / 2, q.s, q.s * .6); x.restore(); });
+                ++n < 210 ? requestAnimationFrame(f) : c.remove();
+            })();
+        }
+
+        function saveCard() {
+            const r = lastRank, player = getPlayerName(), rows = Math.min(wrongList.length, 4), W = 720, H = 760 + (rows ? 70 + rows * 44 : 0);
+            const c = document.createElement('canvas'); c.width = W; c.height = H;
+            const x = c.getContext('2d'), f = '"BiauKai","DFKai-SB","Noto Serif TC",serif';
+            x.fillStyle = '#5c1010'; x.fillRect(0, 0, W, H);
+            x.fillStyle = '#f7eed6'; x.fillRect(28, 28, W - 56, H - 56);
+            x.strokeStyle = '#d4af37'; x.lineWidth = 10; x.strokeRect(28, 28, W - 56, H - 56);
+            x.textAlign = 'center'; x.fillStyle = '#854d0e'; x.font = `bold 24px ${f}`; x.fillText('奉天承運・翰林院宣榜', W / 2, 78);
+            x.fillStyle = '#7c1919'; x.font = `bold 44px ${f}`; x.fillText(LEVELS[currentLevel].name + '・殿試金榜', W / 2, 130);
+            x.fillStyle = '#991b1b'; x.fillRect(90, 150, W - 180, 4);
+            x.fillStyle = '#7c1919'; x.font = `bold 32px ${f}`; x.fillText(`欽定考生：【${player}】`, W / 2, 196);
+            x.textAlign = 'left'; x.fillStyle = '#7c1919'; x.font = `bold 170px ${f}`; x.fillText(score, 80, 385);
+            x.save(); x.translate(540, 305); x.rotate(-.18); x.strokeStyle = x.fillStyle = r.color; x.lineWidth = 10;
+            x.strokeRect(-115, -85, 230, 170); x.font = `bold 90px ${f}`; x.textAlign = 'center'; x.fillText(r.grade, 0, 32); x.restore();
+            x.textAlign = 'center'; x.fillStyle = r.color; x.font = `bold 58px ${f}`; x.fillText(r.title, W / 2, 495);
+            x.fillStyle = '#444'; x.font = `28px ${f}`; x.fillText(r.remark, W / 2, 550);
+            x.font = '34px sans-serif'; x.fillText(resultHistory.slice(0, 14).join(''), W / 2, 620);
+            let y = 690;
+            if (rows) {
+                x.fillStyle = '#b91c1c'; x.font = `bold 30px ${f}`; x.fillText('❌ 硃筆圈選錯題', W / 2, y); y += 50;
+                x.fillStyle = '#111'; x.font = `32px ${f}`;
+                wrongList.slice(0, 4).forEach(q => { x.fillText(wrongText(q), W / 2, y); y += 44; });
+            }
+            x.fillStyle = '#8b5a2b'; x.font = `26px ${f}`; x.fillText('你也來應試 👉 御前字音殿試', W / 2, H - 55);
+            c.toBlob(b => {
+                const file = new File([b], '御前字音殿試榜單.png', { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ files: [file] }).catch(() => {}); return; }
+                const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = '御前字音殿試榜單.png'; a.click();
+            });
+        }
+
+        function confirmBackToMenu() { clearTimer(); saveProgress(); backToMenu(); }
+        function backToMenu() {
+            switchBgmScene('cover');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('home-btn').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            refreshBest();
+        }
+        function restartGame() { clearSavedProgress(); document.getElementById('game-over-screen').classList.add('hidden'); startGame(currentLevel); }
+
+        function watchAdToRevive() {
+            lives = maxLives;
+            if (resultHistory.length > 0 && resultHistory[resultHistory.length - 1] === '🟥') { resultHistory.pop(); wrongList.pop(); }
+            saveProgress();
+            window.open(AD_LINK, '_blank');
+            setTimeout(() => {
+                updateUI();
+                document.getElementById('game-over-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                document.getElementById('home-btn').classList.remove('hidden');
+                loadQuestion();
+            }, 500);
+        }
+
+        function shareResult() {
+            const r = lastRank || getRank(false), player = getPlayerName(), url = location.href.startsWith('http') ? location.href : '(請貼上遊戲網址)';
+            const text = `📜 【${player}】於《御前字音殿試・${LEVELS[currentLevel].name}》拿下 ${score} 分【${r.grade}・${r.title}】\n${resultHistory.join('')}\n\n${r.remark}\n你敢來殿試嗎？👇\n${url}`;
+            if (navigator.share) { navigator.share({ text }).catch(() => {}); return; }
+            navigator.clipboard ? navigator.clipboard.writeText(text).then(() => showToast('已複製！快去貼給好友看')).catch(() => {}) : showToast('已複製！');
+        }
+
+        function showToast(msg = '已複製！') {
+            const toast = document.getElementById('copy-toast');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0'); toast.classList.add('opacity-100');
+            setTimeout(() => { toast.classList.remove('opacity-100'); toast.classList.add('opacity-0'); }, 2200);
+        }
+    </script>
+</body>
+</html>
