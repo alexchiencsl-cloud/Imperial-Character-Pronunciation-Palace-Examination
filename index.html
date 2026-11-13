@@ -86,7 +86,9 @@
         /* 御前考題卷軸框 */
         .exam-scroll {
             position: relative;
-            background: linear-gradient(180deg, var(--paper-100) 0%, var(--paper-200) 100%);
+            background:
+                linear-gradient(180deg, rgba(255, 249, 233, 0.72) 0%, rgba(243, 230, 191, 0.78) 100%),
+                url('assets/scroll_parchment_ink.jpg') center/cover no-repeat;
             border-top: 3px solid var(--wine-800);
             border-bottom: 3px solid var(--wine-800);
             border-left: 1.5px solid var(--gold-500);
@@ -190,24 +192,36 @@
 
         #start-screen {
             background:
-                radial-gradient(circle at 50% 18%, rgba(246, 220, 130, 0.22) 0%, transparent 52%),
-                radial-gradient(ellipse at bottom, rgba(160, 25, 25, 0.45) 0%, transparent 60%),
-                linear-gradient(180deg, #5c0e0e 0%, #3a0707 52%, #1f0303 100%);
+                linear-gradient(180deg, rgba(40, 5, 7, 0.25) 0%, rgba(40, 5, 7, 0.35) 55%, rgba(24, 3, 4, 0.72) 100%),
+                url('assets/palace_cover_bg.jpg') center/cover no-repeat;
+        }
+        .plaque-art {
+            background: url('assets/imperial_plaque_seal.jpg') center/cover no-repeat;
+            border: 2px solid var(--gold-500);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
         }
         #game-over-screen {
             background:
-                radial-gradient(circle at 50% 16%, rgba(246, 220, 130, 0.2) 0%, transparent 50%),
-                linear-gradient(180deg, #580d0d 0%, #340606 55%, #1c0303 100%);
+                linear-gradient(180deg, rgba(40, 5, 7, 0.22) 0%, rgba(40, 5, 7, 0.34) 60%, rgba(24, 3, 4, 0.72) 100%),
+                url('assets/palace_result_bg.jpg') center/cover no-repeat;
         }
         #game-over-screen.emperor-pass-mode {
             background:
-                radial-gradient(circle at 50% 18%, rgba(254, 240, 138, 0.4) 0%, transparent 55%),
-                linear-gradient(180deg, #854d0e 0%, #6b1414 48%, #220404 100%);
+                radial-gradient(circle at 50% 18%, rgba(254, 240, 138, 0.42) 0%, transparent 55%),
+                linear-gradient(180deg, rgba(133, 77, 14, 0.52) 0%, rgba(74, 12, 16, 0.55) 55%, rgba(28, 3, 4, 0.78) 100%),
+                url('assets/palace_result_bg.jpg') center/cover no-repeat;
+        }
+        #scroll-inner {
+            background:
+                linear-gradient(180deg, rgba(255, 249, 233, 0.7) 0%, rgba(243, 230, 191, 0.76) 100%),
+                url('assets/scroll_parchment_ink.jpg') center/cover no-repeat;
         }
         #game-over-screen.emperor-pass-mode #scroll-inner {
             border-width: 3px;
             border-color: #fef08a;
-            background: linear-gradient(180deg, #fffef5 0%, #fef3c7 55%, #fde68a 100%);
+            background:
+                linear-gradient(180deg, rgba(255, 254, 245, 0.76) 0%, rgba(254, 243, 199, 0.78) 55%, rgba(253, 230, 138, 0.82) 100%),
+                url('assets/scroll_parchment_ink.jpg') center/cover no-repeat;
             box-shadow: 0 0 28px rgba(254, 240, 138, 0.45), 0 12px 30px rgba(0, 0, 0, 0.7);
         }
         .gold-text {
@@ -321,27 +335,6 @@
         <!-- 啟動畫面 (宮廷金殿視覺) -->
         <div id="start-screen" class="absolute inset-0 z-50 flex flex-col justify-between items-center gap-1.5 text-amber-50 px-3 py-2 text-center overflow-y-auto overflow-x-hidden no-scrollbar">
 
-            <!-- 宮廷金殿背景 SVG (紅柱、龍旗、紅毯、祥雲) -->
-            <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-45" viewBox="0 0 430 800" preserveAspectRatio="none">
-                <defs>
-                    <linearGradient id="pillarG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3b0707"/><stop offset=".45" stop-color="#8b1a1a"/><stop offset="1" stop-color="#2b0404"/></linearGradient>
-                    <linearGradient id="carpetG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7f1d1d" stop-opacity=".2"/><stop offset="1" stop-color="#991b1b" stop-opacity=".85"/></linearGradient>
-                </defs>
-                <!-- 左右大柱 -->
-                <rect x="8" y="0" width="32" height="800" fill="url(#pillarG)"/>
-                <rect x="390" y="0" width="32" height="800" fill="url(#pillarG)"/>
-                <!-- 左右龍旗燈籠 -->
-                <rect x="12" y="68" width="24" height="96" rx="6" fill="#991b1b" stroke="#d4af37" stroke-width="1.5"/>
-                <rect x="394" y="68" width="24" height="96" rx="6" fill="#991b1b" stroke="#d4af37" stroke-width="1.5"/>
-                <!-- 殿前紅毯 -->
-                <polygon points="145,270 285,270 365,800 65,800" fill="url(#carpetG)"/>
-                <line x1="150" y1="270" x2="75" y2="800" stroke="#d4af37" stroke-width="1.5" stroke-opacity=".5"/>
-                <line x1="280" y1="270" x2="355" y2="800" stroke="#d4af37" stroke-width="1.5" stroke-opacity=".5"/>
-                <!-- 底部祥雲 -->
-                <path d="M0 785 Q35 760 70 780 Q105 765 130 795 L0 800Z" fill="#7c1919" stroke="#d4af37" stroke-width="1" stroke-opacity=".4"/>
-                <path d="M430 785 Q395 760 360 780 Q325 765 300 795 L430 800Z" fill="#7c1919" stroke="#d4af37" stroke-width="1" stroke-opacity=".4"/>
-            </svg>
-
             <!-- 頂部列 -->
             <div class="w-full flex flex-col gap-1 shrink-0 relative z-10">
                 <div class="w-full flex justify-between items-center text-[11px]">
@@ -364,21 +357,10 @@
 
             <!-- 玉璽金匾 & 殿試紀錄 -->
             <div class="flex flex-col items-center shrink-0 relative z-10 w-full max-w-[375px]">
-                <!-- 玉璽 SVG -->
-                <svg viewBox="0 0 60 36" class="w-12 h-8 -mb-2.5 relative z-20 drop-shadow-[0_3px_4px_rgba(0,0,0,0.6)]">
-                    <defs><linearGradient id="jadeG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a7f3d0"/><stop offset=".5" stop-color="#34d399"/><stop offset="1" stop-color="#065f46"/></linearGradient></defs>
-                    <path d="M22 14 C22 7 38 7 38 14 L40 20 L20 20 Z" fill="url(#jadeG)" stroke="#064e3b" stroke-width="1"/>
-                    <circle cx="30" cy="10" r="4" fill="#6ee7b7" stroke="#064e3b" stroke-width="1"/>
-                    <rect x="13" y="19" width="34" height="12" rx="2" fill="url(#jadeG)" stroke="#d4af37" stroke-width="1.2"/>
-                    <rect x="16" y="29" width="28" height="4" rx="1" fill="#065f46" stroke="#f6dc82" stroke-width=".8"/>
-                </svg>
-
-                <!-- 皇家龍紋匾額 (點匾可試聽宮廷序曲) -->
-                <div onclick="playCoverPreview()" class="royal-plaque w-full rounded-2xl px-4 pt-3.5 pb-2.5 mb-2 relative cursor-pointer">
-                    <div class="absolute top-1.5 left-2.5 text-[#d4af37]/65 text-xs">❖</div>
-                    <div class="absolute top-1.5 right-2.5 text-[#d4af37]/65 text-xs">❖</div>
-                    <h1 class="gold-text text-[30px] sm:text-[34px] font-black tracking-[0.2em] leading-tight">御前字音殿試</h1>
-                    <div class="text-xs tracking-[0.3em] text-[#f6dc82] font-bold mt-1">❖ 五關科舉破關制 ❖</div>
+                <!-- 皇家龍紋玉璽金匾插畫 (點匾可試聽宮廷序曲) -->
+                <div onclick="playCoverPreview()" class="plaque-art w-full rounded-2xl px-4 pt-12 pb-4 mb-2 relative cursor-pointer flex flex-col items-center justify-center overflow-hidden">
+                    <h1 class="gold-text text-[28px] sm:text-[32px] font-black tracking-[0.2em] leading-tight drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)]">御前字音殿試</h1>
+                    <div class="text-[11px] tracking-[0.28em] text-[#FFF1B8] font-bold mt-0.5 drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">❖ 五關科舉破關制 ❖</div>
                 </div>
 
                 <!-- 殿試紀錄木匾 -->
@@ -514,18 +496,6 @@
         <!-- 古典榜單結算畫面 (御前黃綾金榜捲軸) -->
         <div id="game-over-screen" class="absolute inset-0 z-40 hidden px-3 py-2 flex flex-col justify-between items-center gap-1.5 overflow-y-auto overflow-x-hidden no-scrollbar">
 
-            <!-- 宮廷屋簷、燈籠與金光放射背景 SVG -->
-            <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-45" viewBox="0 0 430 800" preserveAspectRatio="none">
-                <defs>
-                    <radialGradient id="haloG" cx="50%" cy="18%" r="48%"><stop offset="0" stop-color="#fde68a" stop-opacity=".42"/><stop offset="1" stop-color="#fde68a" stop-opacity="0"/></radialGradient>
-                </defs>
-                <rect width="430" height="800" fill="url(#haloG)"/>
-                <path d="M0 70 Q50 65 95 30 L0 30Z" fill="#2b0404" stroke="#d4af37" stroke-width="1"/>
-                <path d="M430 70 Q380 65 335 30 L430 30Z" fill="#2b0404" stroke="#d4af37" stroke-width="1"/>
-                <rect x="6" y="545" width="20" height="54" rx="5" fill="#d97706" stroke="#fde68a" stroke-width="1.5" opacity=".55"/>
-                <rect x="404" y="545" width="20" height="54" rx="5" fill="#d97706" stroke="#fde68a" stroke-width="1.5" opacity=".55"/>
-            </svg>
-
             <!-- 頂部放榜標題區 -->
             <div class="w-full max-w-[378px] shrink-0 z-10 text-center">
                 <svg viewBox="0 0 360 30" class="w-full h-6 block drop-shadow -mb-1">
@@ -559,7 +529,7 @@
             <!-- 主捲軸畫布 (自適應撐滿剩餘高度、手機防重疊) -->
             <div id="report-card" class="relative w-full max-w-[378px] flex-1 shrink-0 flex flex-col justify-between z-10 mx-1">
                 <!-- 宣紙黃綾榜身 -->
-                <div id="scroll-inner" class="flex-1 mx-1.5 rounded-xl border-2 border-[#d4af37] bg-gradient-to-b from-[#fffaf0] via-[#f8ebd0] to-[#f1dcad] shadow-[0_10px_28px_rgba(0,0,0,0.65)] px-3 py-2 flex flex-col justify-between gap-1.5 text-stone-900 relative overflow-x-hidden">
+                <div id="scroll-inner" class="flex-1 mx-1.5 rounded-xl border-2 border-[#d4af37] shadow-[0_10px_28px_rgba(0,0,0,0.65)] px-3 py-2 flex flex-col justify-between gap-1.5 text-stone-900 relative overflow-x-hidden">
                     <!-- 祥雲浮水印 SVG -->
                     <svg class="pointer-events-none absolute -right-4 top-12 w-32 h-32 opacity-10" viewBox="0 0 100 100">
                         <path d="M20 65 Q30 45 50 50 Q65 35 80 50 Q92 55 85 70 Q70 80 45 75 Q25 80 20 65Z" fill="#9a6b12"/>
