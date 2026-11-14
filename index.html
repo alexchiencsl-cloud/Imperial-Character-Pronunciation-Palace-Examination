@@ -196,9 +196,85 @@
                 url('assets/palace_cover_bg.jpg') center/cover no-repeat;
         }
         .plaque-art {
-            background: url('assets/imperial_plaque_seal.jpg') center/cover no-repeat;
-            border: 2px solid var(--gold-500);
-            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.7);
+            position: relative;
+            background: url('assets/imperial_plaque_seal.jpg') center 47% / 106% auto no-repeat;
+            aspect-ratio: 16 / 7.8;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.72);
+        }
+        .plaque-art::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg, transparent 32%, rgba(255, 241, 184, 0.28) 48%, rgba(255, 255, 255, 0.36) 50%, rgba(255, 241, 184, 0.24) 52%, transparent 68%);
+            transform: translateX(-130%);
+            animation: shimmerSweep 4.8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes shimmerSweep {
+            0%, 55% { transform: translateX(-130%); }
+            85%, 100% { transform: translateX(130%); }
+        }
+        @keyframes dustFloat {
+            0% { transform: translateY(0) translateX(0) scale(0.7); opacity: 0; }
+            20% { opacity: 0.85; }
+            80% { opacity: 0.65; }
+            100% { transform: translateY(-160px) translateX(16px) scale(1.15); opacity: 0; }
+        }
+        .palace-dust {
+            position: absolute;
+            border-radius: 9999px;
+            background: radial-gradient(circle, #fff7cc 0%, #f6dc82 45%, transparent 75%);
+            box-shadow: 0 0 8px rgba(246, 220, 130, 0.75);
+            animation: dustFloat var(--dur, 7s) linear infinite;
+            animation-delay: var(--del, 0s);
+        }
+        @keyframes avatarBreathe {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-2px) scale(1.03); }
+        }
+        @keyframes avatarHappy {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.16) rotate(-5deg); }
+            55% { transform: scale(1.12) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        @keyframes avatarOops {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-4px) rotate(-6deg); }
+            50% { transform: translateX(4px) rotate(6deg); }
+            75% { transform: translateX(-3px) rotate(-3deg); }
+        }
+        @keyframes auraPulse {
+            0%, 100% { box-shadow: 0 0 0 2px #f6dc82, 0 0 12px rgba(245, 158, 11, 0.75); }
+            50% { box-shadow: 0 0 0 4px #fef08a, 0 0 22px rgba(251, 191, 36, 0.95); }
+        }
+        .avatar-live img { animation: avatarBreathe 3.2s ease-in-out infinite; }
+        .avatar-happy { animation: avatarHappy 0.55s cubic-bezier(.2,1.5,.4,1); box-shadow: 0 0 18px rgba(16, 185, 129, 0.8) !important; }
+        .avatar-oops { animation: avatarOops 0.45s ease-in-out; box-shadow: 0 0 16px rgba(220, 38, 38, 0.8) !important; }
+        .avatar-fire { animation: auraPulse 1.3s ease-in-out infinite; }
+        @keyframes scrollUnfurl {
+            0% { opacity: 0.4; transform: scale(0.95) translateY(6px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .scroll-unfurl { animation: scrollUnfurl 0.28s cubic-bezier(.22,1,.36,1); }
+        @keyframes stampSlam {
+            0% { transform: scale(2.4) rotate(-18deg); opacity: 0; }
+            45% { transform: scale(0.92) rotate(-6deg); opacity: 1; }
+            65% { transform: scale(1.06) rotate(-8deg); opacity: 1; }
+            85% { transform: scale(1) rotate(-8deg); opacity: 1; }
+            100% { transform: scale(0.96) rotate(-8deg); opacity: 0; }
+        }
+        .stamp-fx { animation: stampSlam 0.9s cubic-bezier(.2,1.4,.4,1) forwards; }
+        @keyframes sparkOut {
+            0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.1); opacity: 0; }
+        }
+        .spark-dot {
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 8px; height: 8px;
+            border-radius: 9999px;
+            animation: sparkOut 0.65s ease-out forwards;
         }
         #game-screen {
             background:
@@ -284,7 +360,8 @@
         /* 手機短螢幕自適應防重疊與對齊修正 */
         @media (max-height: 750px) {
             #start-screen { padding-top: 6px; padding-bottom: 6px; gap: 5px; }
-            #start-screen h1 { font-size: 1.5rem !important; }
+            #start-screen .plaque-art { aspect-ratio: 16 / 7.4; margin-bottom: 4px; }
+            #start-screen h1 { font-size: 1.35rem !important; }
             #start-screen .royal-plaque { padding-top: 8px; padding-bottom: 6px; margin-bottom: 6px; }
             #start-screen #stage-grid button { padding: 6px; gap: 4px; }
             #start-screen #stage-grid .w-10 { width: 2.25rem; height: 2.25rem; }
@@ -338,6 +415,17 @@
 
         <!-- 啟動畫面 (宮廷金殿視覺) -->
         <div id="start-screen" class="absolute inset-0 z-50 flex flex-col justify-between items-center gap-1.5 text-amber-50 px-3 py-2 text-center overflow-y-auto overflow-x-hidden no-scrollbar">
+            <!-- 宮廷金粉星塵動態層 -->
+            <div class="pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
+                <span class="palace-dust" style="left:8%;bottom:-10px;width:5px;height:5px;--dur:6.5s;--del:0s;"></span>
+                <span class="palace-dust" style="left:18%;bottom:-10px;width:4px;height:4px;--dur:8s;--del:1.4s;"></span>
+                <span class="palace-dust" style="left:31%;bottom:-10px;width:6px;height:6px;--dur:7.2s;--del:2.8s;"></span>
+                <span class="palace-dust" style="left:45%;bottom:-10px;width:4px;height:4px;--dur:9s;--del:0.7s;"></span>
+                <span class="palace-dust" style="left:58%;bottom:-10px;width:5px;height:5px;--dur:6.8s;--del:3.2s;"></span>
+                <span class="palace-dust" style="left:72%;bottom:-10px;width:6px;height:6px;--dur:7.6s;--del:1.9s;"></span>
+                <span class="palace-dust" style="left:84%;bottom:-10px;width:4px;height:4px;--dur:8.4s;--del:0.4s;"></span>
+                <span class="palace-dust" style="left:92%;bottom:-10px;width:5px;height:5px;--dur:7s;--del:4.1s;"></span>
+            </div>
 
             <!-- 頂部列 -->
             <div class="w-full flex flex-col gap-1 shrink-0 relative z-10">
@@ -362,9 +450,9 @@
             <!-- 玉璽金匾 & 殿試紀錄 -->
             <div class="flex flex-col items-center shrink-0 relative z-10 w-full max-w-[375px]">
                 <!-- 皇家龍紋玉璽金匾插畫 (點匾可試聽宮廷序曲) -->
-                <div onclick="playCoverPreview()" class="plaque-art w-full rounded-2xl px-4 pt-12 pb-4 mb-2 relative cursor-pointer flex flex-col items-center justify-center overflow-hidden">
-                    <h1 class="gold-text text-[28px] sm:text-[32px] font-black tracking-[0.2em] leading-tight drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)]">御前字音殿試</h1>
-                    <div class="text-[11px] tracking-[0.28em] text-[#FFF1B8] font-bold mt-0.5 drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">❖ 五關科舉破關制 ❖</div>
+                <div onclick="playCoverPreview()" class="plaque-art w-full rounded-2xl px-[19%] pt-[5.5%] pb-[2%] mb-2 relative cursor-pointer flex flex-col items-center justify-center overflow-hidden">
+                    <h1 class="gold-text text-[23px] sm:text-[25px] font-black tracking-[0.14em] pl-[0.14em] leading-tight whitespace-nowrap drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)]">御前字音殿試</h1>
+                    <div class="text-[10px] sm:text-[11px] tracking-[0.22em] pl-[0.22em] text-[#FFF1B8] font-bold mt-1 whitespace-nowrap drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">❖ 五關科舉破關制 ❖</div>
                 </div>
 
                 <!-- 殿試紀錄木匾 -->
@@ -435,7 +523,7 @@
 
                 <!-- 考官大頭像對話框 -->
                 <div id="examiner-banner" class="bang-card mt-1 bg-gradient-to-r from-[#fffdf5] to-[#fbf0d4] rounded-2xl px-2.5 py-1.5 flex items-center gap-2.5 shadow-sm">
-                    <div id="examiner-avatar" class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full border-2 border-[#991b1b] shadow overflow-hidden bg-amber-50"></div>
+                    <div id="examiner-avatar" class="avatar-live w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full border-2 border-[#991b1b] shadow overflow-hidden bg-amber-50"></div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between mb-0.5">
                             <span id="examiner-name" class="text-xs sm:text-sm font-black text-[#7c1919] tracking-wider">縣令老夫子</span>
@@ -458,7 +546,7 @@
                 </div>
             </div>
 
-            <div id="feedback-icon" class="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold opacity-0 transition-opacity duration-200 pointer-events-none z-30">⭕</div>
+            <div id="feedback-icon" class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30"></div>
 
             <!-- 選項與作答後操作區 (2x2 格線免捲動) -->
             <div class="w-full flex flex-col justify-end shrink-0 gap-1.5">
@@ -486,7 +574,7 @@
                 <div class="bang-card border-4 border-[#D6A936] rounded-2xl p-4 max-w-xs w-full text-[#1D1614] shadow-2xl text-center relative" style="background:linear-gradient(180deg,rgba(255,249,233,0.82),rgba(243,230,191,0.88)),url('assets/scroll_parchment_ink.jpg') center/cover no-repeat">
                     <div class="text-xs tracking-[0.3em] text-[#74151B] font-bold mb-1">奉旨開考・試場須知</div>
                     <div id="intro-stage-title" class="text-xl font-black text-[#74151B] mb-2">第一關・字音初試</div>
-                    <div id="intro-avatar" class="w-24 h-24 mx-auto rounded-full border-4 border-[#D6A936] ring-2 ring-[#74151B] shadow-lg overflow-hidden mb-2 bg-amber-50"></div>
+                    <div id="intro-avatar" class="avatar-live w-24 h-24 mx-auto rounded-full border-4 border-[#D6A936] ring-2 ring-[#74151B] shadow-lg overflow-hidden mb-2 bg-amber-50"></div>
                     <div id="intro-examiner" class="text-sm font-black text-[#74151B] mb-1.5">主考官：縣令老夫子</div>
                     <div id="intro-desc" class="text-xs text-[#392B27] bg-[#FFFDF7]/85 border border-[#D6A936] rounded-xl p-2.5 leading-relaxed mb-2 text-left"></div>
                     <div id="intro-rule" class="text-xs font-bold text-[#74151B] bg-[#FFF1B8]/90 border border-[#D6A936] rounded-lg py-1.5 px-2 mb-3"></div>
@@ -499,6 +587,7 @@
 
         <!-- 古典榜單結算畫面 (御前黃綾金榜捲軸) -->
         <div id="game-over-screen" class="absolute inset-0 z-40 hidden px-3 py-2 flex flex-col justify-between items-center gap-1.5 overflow-y-auto overflow-x-hidden no-scrollbar">
+            <canvas id="emperor-fx-canvas" class="pointer-events-none absolute inset-0 w-full h-full z-20"></canvas>
 
             <!-- 頂部放榜標題區 -->
             <div class="w-full max-w-[378px] shrink-0 z-10 text-center">
@@ -652,7 +741,7 @@
 龜裂|ㄐㄩㄣ ㄌㄧㄝˋ|ㄍㄨㄟ ㄌㄧㄝˋ|ㄍㄨㄟ ㄌㄧㄝ|ㄐㄩㄣ ㄌㄧㄝ|「龜」指皮膚或物體因乾燥而裂開時讀 ㄐㄩㄣ。
 秘魯|ㄅㄧˋ ㄌㄨˇ|ㄇㄧˋ ㄌㄨˇ|ㄇㄧˋ ㄌㄨ|ㄅㄧˋ ㄌㄨ|「秘」作南美洲國名「秘魯」時讀 ㄅㄧˋ。
 角色|ㄐㄩㄝˊ ㄙㄜˋ|ㄐㄧㄠˇ ㄙㄜˋ|ㄐㄩㄝˊ ㄕㄞˇ|ㄐㄧㄠˇ ㄕㄞˇ|「角」作戲劇人物解時讀 ㄐㄩㄝˊ，不讀 ㄐㄧㄠˇ。
-滑稽|ㄍㄨˇ ㄐㄧ|ㄏㄨㄚˊ ㄐㄧ|ㄏㄨㄚˊ ㄐㄧˊ|ㄍㄨˇ ㄐㄧˊ|「滑稽」傳統正音讀 ㄍㄨˇ ㄐㄧ（形容言語動作幽默風趣）。
+滑稽|ㄏㄨㄚˊ ㄐㄧ|ㄏㄨㄚˋ ㄐㄧ|ㄏㄨㄚˊ ㄐㄧˊ|ㄍㄨˇ ㄐㄧˊ|「滑稽」依教育部審訂表今讀 ㄏㄨㄚˊ ㄐㄧ；僅《史記・滑稽列傳》等古籍讀 ㄍㄨˇ ㄐㄧ。
 肉燥|ㄖㄡˋ ㄙㄠˋ|ㄖㄡˋ ㄗㄠˋ|ㄖㄡˋ ㄘㄠˋ|ㄖㄡˋ ㄕㄠˋ|「燥」指切碎的肉末（肉燥）時讀 ㄙㄠˋ。
 牛仔褲|ㄋㄧㄡˊ ㄗㄞˇ ㄎㄨˋ|ㄋㄧㄡˊ ㄗˇ ㄎㄨˋ|ㄋㄧㄡˊ ㄓㄞˇ ㄎㄨˋ|ㄋㄧㄡˊ ㄗㄞˋ ㄎㄨˋ|「仔」作「牛仔」解讀 ㄗㄞˇ（三聲）。
 法國|ㄈㄚˇ ㄍㄨㄛˊ|ㄈㄚˋ ㄍㄨㄛˊ|ㄈㄚ ㄍㄨㄛˊ|ㄈㄚˇ ㄍㄨㄛˇ|「法」在台灣標準音為 ㄈㄚˇ（三聲），不讀四聲。
@@ -664,7 +753,7 @@
 酗酒|ㄒㄩˋ ㄐㄧㄡˇ|ㄒㄩㄥ ㄐㄧㄡˇ|ㄒㄩˋ ㄐㄧㄡˋ|ㄒㄩㄥˋ ㄐㄧㄡˇ|「酗」讀 ㄒㄩˋ（四聲），切勿看成「凶」而讀 ㄒㄩㄥ。
 校對|ㄐㄧㄠˋ ㄉㄨㄟˋ|ㄒㄧㄠˋ ㄉㄨㄟˋ|ㄐㄧㄠˇ ㄉㄨㄟˋ|ㄒㄧㄠˋ ㄉㄨㄟˇ|「校」作核對、考訂解讀 ㄐㄧㄠˋ；作學校解讀 ㄒㄧㄠˋ。
 瀑布|ㄆㄨˋ ㄅㄨˋ|ㄅㄠˋ ㄅㄨˋ|ㄆㄠˋ ㄅㄨˋ|ㄆㄨˊ ㄅㄨˋ|「瀑」讀 ㄆㄨˋ（四聲），常因「暴」偏旁誤讀為 ㄅㄠˋ。
-脈搏|ㄇㄛˋ ㄅㄛˊ|ㄇㄞˋ ㄅㄛˊ|ㄇㄛˋ ㄅㄛˋ|ㄇㄞˋ ㄅㄛˋ|「脈」在「脈搏、含情脈脈」讀 ㄇㄛˋ（又音 ㄇㄞˋ）。
+脈搏|ㄇㄞˋ ㄅㄛˊ|ㄇㄛˋ ㄅㄛˊ|ㄇㄞˋ ㄅㄛˋ|ㄇㄛˋ ㄅㄛˋ|「脈」作血脈解（脈搏、動脈）依教育部審訂表讀 ㄇㄞˋ；僅「含情脈脈」讀 ㄇㄛˋ。
 彆扭|ㄅㄧㄝˋ ㄋㄧㄡˇ|ㄅㄧㄝˊ ㄋㄧㄡˇ|ㄅㄧㄢˇ ㄋㄧㄡˇ|ㄅㄧㄝˋ ㄋㄧㄡˋ|「彆」讀 ㄅㄧㄝˋ（四聲），「彆扭」意為不順從、固執。
 氾濫|ㄈㄢˋ ㄌㄢˋ|ㄅㄢˋ ㄌㄢˋ|ㄈㄢˋ ㄌㄢˊ|ㄈㄢˊ ㄌㄢˋ|「氾」讀 ㄈㄢˋ，「濫」讀 ㄌㄢˋ。
 瑕疵|ㄒㄧㄚˊ ㄘ|ㄒㄧㄚˊ ㄗˇ|ㄒㄧㄚˊ ㄘˋ|ㄒㄧㄚˋ ㄘ|「疵」讀 ㄘ（一聲），常誤讀為二聲或三聲。
@@ -677,7 +766,7 @@
 括弧|ㄎㄨㄛˋ ㄏㄨˊ|ㄍㄨㄚ ㄏㄨˊ|ㄎㄨㄛˋ ㄍㄨㄥ|ㄍㄨㄚ ㄍㄨㄥ|「括」讀 ㄎㄨㄛˋ（四聲），不讀 ㄍㄨㄚ。
 糟糕|ㄗㄠ ㄍㄠ|ㄗㄠˋ ㄍㄠ|ㄗㄠ ㄍㄠˇ|ㄗㄠˋ ㄍㄠˇ|「糟」與「糕」皆為一聲。
 惡劣|ㄜˋ ㄌㄧㄝˋ|ㄜˇ ㄌㄧㄝˋ|ㄜˋ ㄌㄨㄛˋ|ㄜˋ ㄌㄧㄝ|「惡」作不好解讀 ㄜˋ；作討厭解（厭惡）讀 ㄨˋ；作想吐解讀 ㄜˇ。
-嘮叨|ㄌㄠˊ ㄉㄠ|ㄌㄠˋ ㄉㄠ|ㄌㄠˊ ㄊㄠ|ㄌㄠˋ ㄊㄠ|「嘮」讀 ㄌㄠˊ（二聲），指不停地說話。
+嘮叨|ㄌㄠˊ ˙ㄉㄠ|ㄌㄠˋ ㄉㄠ|ㄌㄠˊ ㄊㄠ|ㄌㄠˋ ㄊㄠ|「嘮叨」標準音讀 ㄌㄠˊ ˙ㄉㄠ（「叨」讀輕聲），指囉嗦不停地說話。
 供給|ㄍㄨㄥ ㄐㄧˇ|ㄍㄨㄥ ㄍㄟˇ|ㄍㄨㄥˋ ㄐㄧˇ|ㄍㄨㄥˋ ㄍㄟˇ|「給」作供應、充足解讀 ㄐㄧˇ（如供給、自給自足）。
 氛圍|ㄈㄣ ㄨㄟˊ|ㄈㄣˋ ㄨㄟˊ|ㄈㄣ ㄩㄢˊ|ㄈㄣˋ ㄩㄢˊ|「氛」讀 ㄈㄣ（一聲），「圍」讀 ㄨㄟˊ（二聲）。
 簽證|ㄑㄧㄢ ㄓㄥˋ|ㄑㄧㄢˇ ㄓㄥˋ|ㄑㄧㄢ ㄓㄥ|ㄒㄧㄢ ㄓㄥˋ|「簽」讀 ㄑㄧㄢ（一聲）。
@@ -737,6 +826,26 @@
 瞠目|ㄔㄥ ㄇㄨˋ|ㄊㄤˊ ㄇㄨˋ|ㄔㄥˊ ㄇㄨˋ|ㄉㄤ ㄇㄨˋ|「瞠」讀 ㄔㄥ（一聲），意為瞪大眼睛直視。
 憧憬|ㄔㄨㄥ ㄐㄧㄥˇ|ㄊㄨㄥˊ ㄐㄧㄥˇ|ㄔㄨㄥˋ ㄐㄧㄥˇ|ㄓㄨㄤˋ ㄐㄧㄥˇ|「憧」讀 ㄔㄨㄥ（一聲），意為心意嚮往。
 驀然|ㄇㄛˋ ㄖㄢˊ|ㄇㄨˋ ㄖㄢˊ|ㄇㄚˋ ㄖㄢˊ|ㄇㄛ ㄖㄢˊ|「驀」讀 ㄇㄛˋ（四聲），意為突然、猛然。
+便宜|ㄆㄧㄢˊ ㄧˊ|ㄅㄧㄢˋ ㄧˊ|ㄆㄧㄢˇ ㄧˊ|ㄅㄧㄢˋ ㄧˋ|「便」作價錢低廉解讀 ㄆㄧㄢˊ（二聲）；便利讀 ㄅㄧㄢˋ。
+校勘|ㄐㄧㄠˋ ㄎㄢ|ㄒㄧㄠˋ ㄎㄢ|ㄐㄧㄠˇ ㄎㄢ|ㄐㄧㄠˋ ㄎㄢˋ|「校」作核對、考訂解讀 ㄐㄧㄠˋ（四聲），「勘」讀 ㄎㄢ（一聲）。
+曝光|ㄆㄨˋ ㄍㄨㄤ|ㄅㄠˋ ㄍㄨㄤ|ㄆㄠˋ ㄍㄨㄤ|ㄅㄠ ㄍㄨㄤ|台灣教育部標準音「曝」作顯露解讀 ㄆㄨˋ（四聲），常誤讀為 ㄅㄠˋ。
+醞釀|ㄩㄣˋ ㄋㄧㄤˋ|ㄨㄣ ㄋㄧㄤˋ|ㄩㄣ ㄋㄧㄤˋ|ㄩㄣˋ ㄖㄤˋ|「醞」讀 ㄩㄣˋ（四聲），「釀」讀 ㄋㄧㄤˋ（四聲）。
+追溯|ㄓㄨㄟ ㄙㄨˋ|ㄓㄨㄟ ㄕㄨㄛˋ|ㄓㄨㄟ ㄙㄨㄛˋ|ㄓㄨㄟˇ ㄙㄨˋ|「溯」讀 ㄙㄨˋ（四聲），意為逆流而上或回顧往事。
+僥倖|ㄐㄧㄠˇ ㄒㄧㄥˋ|ㄧㄠˊ ㄒㄧㄥˋ|ㄐㄧㄠ ㄒㄧㄥˋ|ㄖㄠˊ ㄒㄧㄥˋ|「僥」讀 ㄐㄧㄠˇ（三聲），意為企求非分而意外獲得。
+咆哮|ㄆㄠˊ ㄒㄧㄠ|ㄆㄠˊ ㄒㄧㄠˋ|ㄅㄠˋ ㄒㄧㄠ|ㄆㄠˇ ㄒㄧㄠ|「哮」讀 ㄒㄧㄠ（一聲），形容猛獸怒吼或人大聲喊叫。
+殷勤|ㄧㄣ ㄑㄧㄣˊ|ㄧㄢ ㄑㄧㄣˊ|ㄧㄣˇ ㄑㄧㄣˊ|ㄧㄢˋ ㄑㄧㄣˊ|「殷」作深厚、懇切解讀 ㄧㄣ（一聲）；「殷紅」讀 ㄧㄢ。
+剖析|ㄆㄡˇ ㄒㄧ|ㄆㄛˇ ㄒㄧ|ㄆㄡˋ ㄒㄧ|ㄆㄡ ㄒㄧˋ|「剖」讀 ㄆㄡˇ（三聲），「析」讀 ㄒㄧ（一聲）。
+笨拙|ㄅㄣˋ ㄓㄨㄛˊ|ㄅㄣˋ ㄓㄨㄛ|ㄅㄣ ㄓㄨㄛˊ|ㄅㄣˋ ㄓㄨㄛˋ|「拙」讀 ㄓㄨㄛˊ（二聲），常誤讀為一聲 ㄓㄨㄛ。
+傾軋|ㄑㄧㄥ ㄧㄚˋ|ㄑㄧㄥ ㄓㄚˊ|ㄑㄧㄥˇ ㄧㄚˋ|ㄑㄧㄥ ㄍㄚˊ|「軋」作排擠解讀 ㄧㄚˋ（四聲），指互相排擠傾陷。
+粗獷|ㄘㄨ ㄍㄨㄤˇ|ㄘㄨ ㄎㄨㄤˋ|ㄘㄨ ㄍㄨㄤˋ|ㄘㄨ ㄎㄨㄤˇ|「獷」讀 ㄍㄨㄤˇ（三聲），意為粗魯豪放，切勿讀成 ㄎㄨㄤˋ。
+拘泥|ㄐㄩ ㄋㄧˋ|ㄐㄩ ㄋㄧˊ|ㄐㄩˇ ㄋㄧˋ|ㄐㄩˋ ㄋㄧˋ|「泥」作固執不知變通解讀 ㄋㄧˋ（四聲）。
+箴言|ㄓㄣ ㄧㄢˊ|ㄐㄧㄢ ㄧㄢˊ|ㄓㄣˇ ㄧㄢˊ|ㄒㄧㄢˊ ㄧㄢˊ|「箴」讀 ㄓㄣ（一聲），意為規勸告誡的話。
+聯袂|ㄌㄧㄢˊ ㄇㄟˋ|ㄌㄧㄢˊ ㄐㄩㄝˊ|ㄌㄧㄢˊ ㄎㄨㄞˋ|ㄌㄧㄢˊ ㄇㄧˋ|「袂」讀 ㄇㄟˋ（四聲），原指衣袖，聯袂意為結伴同行。
+撫卹|ㄈㄨˇ ㄒㄩˋ|ㄈㄨˇ ㄒㄧㄝˇ|ㄈㄨˋ ㄒㄩˋ|ㄈㄨˇ ㄊㄧˋ|「卹」讀 ㄒㄩˋ（四聲），意為安撫救濟。
+奢靡|ㄕㄜ ㄇㄧˇ|ㄕㄜ ㄇㄧˊ|ㄕㄜˇ ㄇㄧˇ|ㄕㄜ ㄇㄧˋ|「靡」作浪費解讀 ㄇㄧˇ（三聲），如奢靡、風靡。
+憎惡|ㄗㄥ ㄨˋ|ㄗㄥˋ ㄜˋ|ㄗㄥ ㄜˋ|ㄗㄥˋ ㄨˋ|「憎」讀 ㄗㄥ（一聲），「惡」作討厭解讀 ㄨˋ（四聲）。
+拮据|ㄐㄧㄝˊ ㄐㄩ|ㄐㄧˊ ㄐㄩˋ|ㄐㄧㄝ ㄐㄩˋ|ㄐㄧㄝˊ ㄐㄩˋ|「拮」讀 ㄐㄧㄝˊ（二聲），「据」在此讀 ㄐㄩ（一聲），形容經濟窘迫。
+斡旋|ㄨㄛˋ ㄒㄩㄢˊ|ㄍㄢˋ ㄒㄩㄢˊ|ㄨㄛ ㄒㄩㄢˊ|ㄨㄛˋ ㄒㄩㄢˇ|「斡」讀 ㄨㄛˋ（四聲），意為從中調解、周旋。
 `;
 
         const RARE_BANK = `
@@ -756,15 +865,20 @@
 毳|ㄘㄨㄟˋ|ㄇㄠˊ|ㄘㄨㄟ|ㄘㄨㄟˊ|三根毛，指鳥獸的細毛。
 淼|ㄇㄧㄠˇ|ㄕㄨㄟˇ|ㄇㄧㄠˋ|ㄇㄧㄠˊ|三個水，形容水勢遼闊。
 靐|ㄅㄧㄥˋ|ㄌㄟˊ|ㄅㄥ|ㄆㄧㄥˋ|三個雷疊在一起，指雷聲。共有 39 畫。
-飍|ㄒㄧㄡ|ㄈㄥ|ㄅㄧㄠ|ㄏㄨ|三陣風疊在一起，指驚跑的樣子。
+飍|ㄒㄧㄡ|ㄈㄥ|ㄒㄧㄠ|ㄏㄨ|三陣風疊在一起，指驚跑的樣子。
 馫|ㄒㄧㄣ|ㄒㄧㄤ|ㄒㄧㄥ|ㄒㄧㄣˋ|三個香疊在一起，與「馨」同義，指香氣濃厚。
-灥|ㄑㄩㄢˊ|ㄕㄨㄟˇ|ㄒㄩㄣˊ|ㄩㄢˊ|三個泉疊在一起，指眾多泉水匯流。
+灥|ㄑㄩㄢˊ|ㄕㄨㄟˇ|ㄔㄨㄢˊ|ㄩㄢˊ|三個泉疊在一起，為「泉」異體字，指眾多泉水匯流（亦讀 ㄒㄩㄣˊ）。
 茻|ㄇㄤˇ|ㄘㄠˇ|ㄏㄨㄟˋ|ㄇㄠˇ|四個「屮」草木叢生，指眾草，也是「莽」的古字。
 饕|ㄊㄠ|ㄏㄠˋ|ㄊㄠˊ|ㄉㄠ|「饕餮」之一，貪食、貪財的意思。
 餮|ㄊㄧㄝˋ|ㄊㄧㄝ|ㄊㄧㄢˇ|ㄉㄧㄝˊ|「饕餮」之一，傳說中貪食的惡獸。
 耄|ㄇㄠˋ|ㄌㄠˇ|ㄇㄠˊ|ㄏㄠˋ|指八、九十歲的年紀，如「耄耋之年」。
 耋|ㄉㄧㄝˊ|ㄓˋ|ㄉㄧㄝˋ|ㄊㄧㄝˊ|指七、八十歲的年紀，如「耄耋之年」。
 齉|ㄋㄤˋ|ㄅㄧˊ|ㄋㄤˊ|ㄋㄤˇ|指鼻子不通而發音不清（齉鼻）。共有 36 畫。
+贔|ㄅㄧˋ|ㄅㄟˋ|ㄅㄧˇ|ㄆㄧˋ|「贔屭」之一，傳說中形似龜的龍生九子之一，好負重。
+屭|ㄒㄧˋ|ㄒㄧ|ㄑㄧˋ|ㄐㄧˋ|「贔屭」之一，常作為石碑底座的靈獸。
+魑|ㄔ|ㄌㄧˊ|ㄔˋ|ㄔˇ|「魑魅魍魎」之一，傳說中山林裡的鬼怪。
+魍|ㄨㄤˇ|ㄇㄤˇ|ㄨㄤˋ|ㄨㄤˊ|「魑魅魍魎」之一，傳說中的山川精怪。
+魎|ㄌㄧㄤˇ|ㄌㄧㄤˋ|ㄌㄧㄤˊ|ㄇㄤˇ|「魑魅魍魎」之一，傳說中的水神或精怪。
 `;
 
         const IDIOM_RAW = `
@@ -818,16 +932,36 @@
 飛揚跋扈|3|ㄏㄨˋ|ㄍㄨˋ|ㄆㄨˋ|ㄏㄨˇ|「扈」讀 ㄏㄨˋ（四聲），形容驕橫放肆。
 提綱挈領|2|ㄑㄧㄝˋ|ㄑㄧˋ|ㄐㄧㄝˊ|ㄑㄧˊ|「挈」讀 ㄑㄧㄝˋ（四聲），指提舉。
 風聲鶴唳|3|ㄌㄧˋ|ㄌㄟˋ|ㄊㄧˋ|ㄌㄧˇ|「唳」讀 ㄌㄧˋ（四聲），指鶴鳴聲，形容驚慌疑懼。
+按部就班|0|ㄢˋ|ㄢ|ㄢˇ|ㄢˊ|「按」讀 ㄢˋ（四聲），指依照次序與條理辦事。
+病骨支離|1|ㄍㄨˇ|ㄍㄨ|ㄍㄨˋ|ㄍㄨˊ|「骨」讀 ㄍㄨˇ（三聲），形容病重體弱消瘦的樣子。
+大相逕庭|2|ㄐㄧㄥˋ|ㄐㄧㄥ|ㄐㄧㄥˇ|ㄐㄧㄥˊ|「逕」讀 ㄐㄧㄥˋ（四聲），形容彼此相差極遠。
+飛蛾撲火|2|ㄆㄨ|ㄆㄨˊ|ㄆㄨˇ|ㄆㄨˋ|「撲」讀 ㄆㄨ（一聲），比喻自取滅亡。
+風塵僕僕|2|ㄆㄨˊ|ㄆㄨ|ㄆㄨˇ|ㄆㄨˋ|「僕」讀 ㄆㄨˊ（二聲），形容奔波勞累。
+高瞻遠矚|3|ㄓㄨˇ|ㄓㄨˋ|ㄕㄨˇ|ㄓㄨˊ|「矚」讀 ㄓㄨˇ（三聲），指看遠處，比喻眼光遠大。
+鬼斧神工|1|ㄈㄨˇ|ㄈㄨˋ|ㄈㄨˊ|ㄈㄨ|「斧」讀 ㄈㄨˇ（三聲），形容技藝精巧，非人力所及。
+汗牛充棟|3|ㄉㄨㄥˋ|ㄉㄨㄥ|ㄉㄨㄥˇ|ㄊㄨㄥˋ|「棟」讀 ㄉㄨㄥˋ（四聲），形容藏書極多。
+呼朋引伴|2|ㄧㄣˇ|ㄧㄣ|ㄧㄣˋ|ㄧㄥˇ|「引」讀 ㄧㄣˇ（三聲），指招引朋友相伴。
+急起直追|0|ㄐㄧˊ|ㄐㄧˋ|ㄐㄧ|ㄐㄧˇ|「急」讀 ㄐㄧˊ（二聲），指趕緊奮發追趕。
+箭在弦上|2|ㄒㄧㄢˊ|ㄒㄩㄢˊ|ㄒㄧㄢˋ|ㄒㄧㄢˇ|「弦」讀 ㄒㄧㄢˊ（二聲），切勿誤讀為 ㄒㄩㄢˊ。
+刻不容緩|3|ㄏㄨㄢˇ|ㄏㄨㄢˋ|ㄏㄨㄢˊ|ㄋㄨㄢˇ|「緩」讀 ㄏㄨㄢˇ（三聲），形容情勢緊迫，一刻也不能延誤。
+濫竽充數|1|ㄩˊ|ㄩˋ|ㄩˇ|ㄩ|「竽」讀 ㄩˊ（二聲），古代吹奏樂器，比喻無真才實學卻混在行家裡。
+歷歷在目|0|ㄌㄧˋ|ㄌㄧˊ|ㄌㄧˇ|ㄌㄧ|「歷」讀 ㄌㄧˋ（四聲），形容過去事物清楚地重現眼前。
+毛遂自薦|1|ㄙㄨㄟˋ|ㄙㄨㄟˊ|ㄙㄨㄟˇ|ㄓㄨㄟ|「遂」讀 ㄙㄨㄟˋ（四聲），指戰國趙國食客毛遂自我推薦。
+目不暇給|3|ㄐㄧˇ|ㄍㄟˇ|ㄐㄧˊ|ㄐㄧˋ|「給」作供應、應接解讀 ㄐㄧˇ（三聲），形容東西太多看不過來。
+南轅北轍|3|ㄔㄜˋ|ㄓㄜˊ|ㄔㄜ|ㄔㄨㄛˋ|「轍」讀 ㄔㄜˋ（四聲），比喻行動與目的相反。
+奇貨可居|1|ㄏㄨㄛˋ|ㄏㄨㄛ|ㄏㄨㄛˇ|ㄏㄜˊ|「貨」讀 ㄏㄨㄛˋ（四聲），比喻囤積稀少物品以待高價，或利用某種優勢謀利。
+千鈞一髮|1|ㄐㄩㄣ|ㄩㄣˊ|ㄐㄩㄣˋ|ㄐㄩㄣˇ|「鈞」讀 ㄐㄩㄣ（一聲），古代重量單位，一鈞為三十斤，比喻情況極危急。
+前車之鑑|3|ㄐㄧㄢˋ|ㄐㄧㄢ|ㄐㄧㄢˇ|ㄐㄧㄢˊ|「鑑」讀 ㄐㄧㄢˋ（四聲），比喻前人的失敗可作為後人的借鏡。
 `;
 
         const EMPEROR_RAW = `
 龜茲|ㄑㄧㄡ ㄘˊ|ㄍㄨㄟ ㄗ|ㄐㄩㄣ ㄗ|ㄑㄧㄡ ㄗ|西域古國名，讀 ㄑㄧㄡ ㄘˊ，為經典破音地名。
-吐蕃|ㄊㄨˇ ㄅㄛ|ㄊㄨˇ ㄈㄢ|ㄊㄨˋ ㄅㄛ|ㄊㄨˇ ㄈㄢˊ|唐代藏族政權名，標準音讀 ㄊㄨˇ ㄅㄛ。
+吐蕃|ㄊㄨˇ ㄈㄢ|ㄊㄨˇ ㄅㄛ|ㄊㄨˋ ㄅㄛ|ㄊㄨˇ ㄈㄢˊ|唐代藏族政權名，台灣教育部《重編國語辭典》標準音讀 ㄊㄨˇ ㄈㄢ。
 大宛|ㄉㄚˋ ㄩㄢ|ㄉㄚˋ ㄨㄢˇ|ㄉㄞˋ ㄩㄢ|ㄉㄚˋ ㄨㄢ|漢代西域國名（出產汗血馬），「宛」讀 ㄩㄢ。
 單于|ㄔㄢˊ ㄩˊ|ㄉㄢ ㄩˊ|ㄕㄢˋ ㄩˊ|ㄔㄢˊ ㄩˇ|匈奴君主稱號，讀 ㄔㄢˊ ㄩˊ。
 可汗|ㄎㄜˋ ㄏㄢˊ|ㄎㄜˇ ㄏㄢˋ|ㄎㄜˋ ㄏㄢˋ|ㄎㄜˇ ㄏㄢˊ|古代鮮卑、突厥、蒙古最高統治者稱號，讀 ㄎㄜˋ ㄏㄢˊ。
 冒頓|ㄇㄛˋ ㄉㄨˊ|ㄇㄠˋ ㄉㄨㄣˋ|ㄇㄛˋ ㄉㄨㄣˋ|ㄇㄠˋ ㄉㄨˊ|匈奴著名單于之名，讀 ㄇㄛˋ ㄉㄨˊ。
-阿房宮|ㄜ ㄆㄤˊ ㄍㄨㄥ|ㄚ ㄈㄤˊ ㄍㄨㄥ|ㄜ ㄈㄤˊ ㄍㄨㄥ|ㄚ ㄆㄤˊ ㄍㄨㄥ|秦代宮殿名，台灣教育部標準音讀 ㄜ ㄆㄤˊ ㄍㄨㄥ。
+阿房宮|ㄜ ㄈㄤˊ ㄍㄨㄥ|ㄚ ㄈㄤˊ ㄍㄨㄥ|ㄜ ㄆㄤˊ ㄍㄨㄥ|ㄚ ㄆㄤˊ ㄍㄨㄥ|秦代宮殿名，台灣教育部《國語一字多音審訂表》標準音讀 ㄜ ㄈㄤˊ ㄍㄨㄥ。
 柏林|ㄅㄛˊ ㄌㄧㄣˊ|ㄅㄞˇ ㄌㄧㄣˊ|ㄅㄛˋ ㄌㄧㄣˊ|ㄅㄞˋ ㄌㄧㄣˊ|德國首都名，台灣教育部標準音讀 ㄅㄛˊ ㄌㄧㄣˊ。
 華盛頓|ㄏㄨㄚˊ ㄕㄥˋ ㄉㄨㄣˋ|ㄏㄨㄚˋ ㄕㄥˋ ㄉㄨㄣˋ|ㄏㄨㄚ ㄕㄥˋ ㄉㄨㄣˋ|ㄏㄨㄚˊ ㄕㄥ ㄉㄨㄣˋ|美國首都與首任總統譯名，「華」讀 ㄏㄨㄚˊ（二聲）。
 太行山|ㄊㄞˋ ㄏㄤˊ ㄕㄢ|ㄊㄞˋ ㄒㄧㄥˊ ㄕㄢ|ㄊㄞˋ ㄏㄤˋ ㄕㄢ|ㄊㄞˋ ㄒㄧㄥˋ ㄕㄢ|中國著名山脈，「行」在此讀 ㄏㄤˊ（二聲）。
@@ -842,8 +976,8 @@
 鼕鼕|ㄉㄨㄥ ㄉㄨㄥ|ㄉㄨㄥˊ ㄉㄨㄥˊ|ㄊㄨㄥ ㄊㄨㄥ|ㄉㄨㄥˋ ㄉㄨㄥˋ|形容敲鼓聲，讀 ㄉㄨㄥ ㄉㄨㄥ（一聲）。
 饕餮|ㄊㄠ ㄊㄧㄝˋ|ㄊㄠˊ ㄊㄧㄝ|ㄏㄠˋ ㄊㄧㄝˋ|ㄊㄠ ㄊㄧㄢˇ|上古貪食凶獸，讀 ㄊㄠ ㄊㄧㄝˋ。
 酈食其|ㄌㄧˋ ㄧˋ ㄐㄧ|ㄌㄧˋ ㄕˊ ㄑㄧˊ|ㄌㄧˋ ㄙˋ ㄐㄧ|ㄌㄧˋ ㄕˊ ㄐㄧ|秦漢名士，人名讀 ㄌㄧˋ ㄧˋ ㄐㄧ。
-大月氏|ㄉㄚˋ ㄖㄡˋ ㄓ|ㄉㄚˋ ㄩㄝˋ ㄕˋ|ㄉㄚˋ ㄩㄝˋ ㄓ|ㄉㄚˋ ㄖㄡˋ ㄕˋ|漢代西域民族名，讀 ㄉㄚˋ ㄖㄡˋ ㄓ。
-身毒|ㄩㄢ ㄉㄨˊ|ㄕㄣ ㄉㄨˊ|ㄐㄩㄢ ㄉㄨˊ|ㄕㄣ ㄉㄨˇ|古代對印度的譯稱，讀 ㄩㄢ ㄉㄨˊ。
+大月氏|ㄉㄚˋ ㄩㄝˋ ㄓ|ㄉㄚˋ ㄩㄝˋ ㄕˋ|ㄉㄚˋ ㄖㄡˋ ㄕˋ|ㄉㄚˋ ㄩㄝˋ ㄓˋ|漢代西域民族名，台灣教育部《重編國語辭典》標準音讀 ㄉㄚˋ ㄩㄝˋ ㄓ。
+身毒|ㄐㄩㄢ ㄉㄨˊ|ㄕㄣ ㄉㄨˊ|ㄩㄢ ㄉㄨˊ|ㄕㄣ ㄉㄨˇ|古代對印度的譯稱，台灣教育部《重編國語辭典》標準音讀 ㄐㄩㄢ ㄉㄨˊ。
 澠池|ㄇㄧㄢˇ ㄔˊ|ㄕㄥˊ ㄔˊ|ㄇㄧㄣˇ ㄔˊ|ㄕㄥˋ ㄔˊ|戰國秦趙會盟古地名，讀 ㄇㄧㄢˇ ㄔˊ。
 澶淵|ㄔㄢˊ ㄩㄢ|ㄉㄢˋ ㄩㄢ|ㄕㄢˋ ㄩㄢ|ㄓㄢ ㄩㄢ|北宋「澶淵之盟」古地名，讀 ㄔㄢˊ ㄩㄢ。
 厓山|ㄧㄞˊ ㄕㄢ|ㄧㄚˊ ㄕㄢ|ㄞˊ ㄕㄢ|ㄧㄚˋ ㄕㄢ|南宋末年海戰古地名，讀 ㄧㄞˊ ㄕㄢ。
@@ -862,7 +996,7 @@
 愛新覺羅|ㄞˋ ㄒㄧㄣ ㄐㄩㄝˊ ㄌㄨㄛˊ|ㄞˋ ㄒㄧㄣ ㄐㄧㄠˋ ㄌㄨㄛˊ|ㄞˋ ㄒㄧㄣ ㄐㄩㄝˋ ㄌㄨㄛˊ|ㄞˋ ㄒㄧㄣ ㄐㄧㄠˇ ㄌㄨㄛˊ|清代皇室姓氏，「覺」讀 ㄐㄩㄝˊ。
 伯顏|ㄅㄛˊ ㄧㄢˊ|ㄅㄞˇ ㄧㄢˊ|ㄅㄛˋ ㄧㄢˊ|ㄅㄚˋ ㄧㄢˊ|元代名將人名，「伯」讀 ㄅㄛˊ。
 嚳|ㄎㄨˋ|ㄍㄠˋ|ㄍㄨˇ|ㄎㄨ|上古五帝之一帝嚳，讀 ㄎㄨˋ（四聲）。
-顓頊|ㄓㄨㄢ ㄒㄩ|ㄓㄨㄢ ㄒㄩˋ|ㄔㄨㄢˊ ㄒㄩ|ㄓㄨㄢ ㄩˋ|上古五帝之一，讀 ㄓㄨㄢ ㄒㄩ（一聲）。
+顓頊|ㄓㄨㄢ ㄒㄩˋ|ㄓㄨㄢ ㄒㄩ|ㄔㄨㄢˊ ㄒㄩˋ|ㄓㄨㄢ ㄩˋ|上古五帝之一，台灣教育部《重編國語辭典》標準音讀 ㄓㄨㄢ ㄒㄩˋ（四聲）。
 皐陶|ㄍㄠ ㄧㄠˊ|ㄍㄠ ㄊㄠˊ|ㄍㄠ ㄊㄠ|ㄏㄠˋ ㄧㄠˊ|堯舜時代掌管刑獄之賢臣，讀 ㄍㄠ ㄧㄠˊ。
 契|ㄒㄧㄝˋ|ㄑㄧˋ|ㄑㄧㄝˋ|ㄐㄧㄝˊ|商族始祖人名，讀 ㄒㄧㄝˋ（四聲）。
 后稷|ㄏㄡˋ ㄐㄧˋ|ㄏㄡˋ ㄐㄧˊ|ㄏㄡˋ ㄗㄜˊ|ㄏㄡˋ ㄐㄧˇ|周族農神始祖，讀 ㄏㄡˋ ㄐㄧˋ。
@@ -871,6 +1005,26 @@
 褒姒|ㄅㄠ ㄙˋ|ㄅㄠ ㄕˋ|ㄅㄠ ㄗˇ|ㄆㄠˊ ㄙˋ|周幽王寵妃，「姒」讀 ㄙˋ（四聲）。
 妲己|ㄉㄚˊ ㄐㄧˇ|ㄉㄢˋ ㄐㄧˇ|ㄉㄚˇ ㄐㄧˇ|ㄉㄚˊ ㄐㄧ|商紂王寵妃，「妲」讀 ㄉㄚˊ（二聲）。
 嬴政|ㄧㄥˊ ㄓㄥˋ|ㄧㄥˊ ㄓㄥ|ㄧㄥˋ ㄓㄥˋ|ㄧㄥˇ ㄓㄥˋ|秦始皇本名，「政」讀 ㄓㄥˋ。
+準噶爾|ㄓㄨㄣˇ ㄍㄚˊ ㄦˇ|ㄓㄨㄣˇ ㄍㄜˊ ㄦˇ|ㄓㄨㄣˇ ㄍㄚ ㄦˇ|ㄓㄨㄣˋ ㄍㄚˊ ㄦˇ|清代西北蒙古部族名，「噶」讀 ㄍㄚˊ（二聲）。
+頡利|ㄐㄧㄝˊ ㄌㄧˋ|ㄒㄧㄝˊ ㄌㄧˋ|ㄐㄧㄝ ㄌㄧˋ|ㄐㄧˊ ㄌㄧˋ|唐初東突厥可汗名（頡利可汗），「頡」在此讀 ㄐㄧㄝˊ。
+黠戛斯|ㄒㄧㄚˊ ㄐㄧㄚˊ ㄙ|ㄐㄧㄝˊ ㄐㄧㄚˊ ㄙ|ㄒㄧㄚˊ ㄍㄚˊ ㄙ|ㄉㄧㄢˇ ㄐㄧㄚˊ ㄙ|唐代北方部族名（今柯爾克孜族先民），讀 ㄒㄧㄚˊ ㄐㄧㄚˊ ㄙ。
+回紇|ㄏㄨㄟˊ ㄏㄜˊ|ㄏㄨㄟˊ ㄍㄜ|ㄏㄨㄟˊ ㄑㄧˋ|ㄏㄨㄟˊ ㄏㄨˊ|唐代北方民族名（後改稱回鶻），「紇」在此讀 ㄏㄜˊ（二聲）。
+回鶻|ㄏㄨㄟˊ ㄏㄨˊ|ㄏㄨㄟˊ ㄍㄨˇ|ㄏㄨㄟˊ ㄏㄜˊ|ㄏㄨㄟˊ ㄐㄩㄝˊ|回紇改稱之名（今維吾爾族先民），「鶻」讀 ㄏㄨˊ（二聲）。
+鮮卑|ㄒㄧㄢ ㄅㄟ|ㄒㄧㄢˇ ㄅㄟ|ㄒㄧㄢ ㄅㄧˋ|ㄒㄧㄢˋ ㄅㄟ|魏晉南北朝北方重要民族，「鮮」讀 ㄒㄧㄢ（一聲）。
+柔然|ㄖㄡˊ ㄖㄢˊ|ㄖㄡˊ ㄖㄢˇ|ㄖㄡˋ ㄖㄢˊ|ㄧㄡ ㄖㄢˊ|南北朝北方游牧政權名，讀 ㄖㄡˊ ㄖㄢˊ。
+渤海國|ㄅㄛˊ ㄏㄞˇ ㄍㄨㄛˊ|ㄅㄛˋ ㄏㄞˇ ㄍㄨㄛˊ|ㄅㄟˋ ㄏㄞˇ ㄍㄨㄛˊ|ㄆㄛˊ ㄏㄞˇ ㄍㄨㄛˊ|唐代東北古國，「渤」讀 ㄅㄛˊ（二聲）。
+女真|ㄋㄩˇ ㄓㄣ|ㄋㄩˇ ㄓㄣˋ|ㄖㄨˇ ㄓㄣ|ㄋㄩˋ ㄓㄣ|金朝與清朝皇室所屬東北民族名，讀 ㄋㄩˇ ㄓㄣ。
+靺鞨|ㄇㄛˋ ㄏㄜˊ|ㄇㄛˋ ㄍㄜˊ|ㄇㄟˋ ㄏㄜˊ|ㄇㄛˊ ㄏㄜˊ|隋唐時期東北民族名，讀 ㄇㄛˋ ㄏㄜˊ。
+高句麗|ㄍㄠ ㄍㄡ ㄌㄧˊ|ㄍㄠ ㄐㄩˋ ㄌㄧˋ|ㄍㄠ ㄍㄡ ㄌㄧˋ|ㄍㄠ ㄐㄩ ㄌㄧˊ|東北亞古國名，「句」讀 ㄍㄡ，「麗」讀 ㄌㄧˊ。
+新羅|ㄒㄧㄣ ㄌㄨㄛˊ|ㄒㄧㄣ ㄌㄨㄛˇ|ㄒㄧㄣˋ ㄌㄨㄛˊ|ㄒㄧㄣ ㄌㄨㄛˋ|朝鮮半島三國時代古國名，讀 ㄒㄧㄣ ㄌㄨㄛˊ。
+百濟|ㄅㄞˇ ㄐㄧˋ|ㄅㄛˊ ㄐㄧˋ|ㄅㄞˇ ㄐㄧˇ|ㄅㄞˋ ㄐㄧˋ|朝鮮半島三國時代古國名，「濟」讀 ㄐㄧˋ（四聲）。
+邪馬臺|ㄧㄝˊ ㄇㄚˇ ㄊㄞˊ|ㄒㄧㄝˊ ㄇㄚˇ ㄊㄞˊ|ㄧㄚˊ ㄇㄚˇ ㄊㄞˊ|ㄧㄝ ㄇㄚˇ ㄊㄞˊ|《三國志》記載的日本古代政權名，「邪」在此讀 ㄧㄝˊ。
+卑彌呼|ㄅㄟ ㄇㄧˊ ㄏㄨ|ㄅㄧˋ ㄇㄧˊ ㄏㄨ|ㄅㄟ ㄇㄧˇ ㄏㄨ|ㄆㄧˊ ㄇㄧˊ ㄏㄨ|邪馬臺國女王名，讀 ㄅㄟ ㄇㄧˊ ㄏㄨ。
+樓蘭|ㄌㄡˊ ㄌㄢˊ|ㄌㄡˇ ㄌㄢˊ|ㄌㄡˋ ㄌㄢˊ|ㄌㄩˇ ㄌㄢˊ|漢代西域絲路古國名，讀 ㄌㄡˊ ㄌㄢˊ。
+于闐|ㄩˊ ㄊㄧㄢˊ|ㄩˊ ㄉㄧㄢˋ|ㄩˇ ㄊㄧㄢˊ|ㄏㄢˊ ㄊㄧㄢˊ|西域古國名（今新疆和田），「闐」讀 ㄊㄧㄢˊ（二聲）。
+疏勒|ㄕㄨ ㄌㄜˋ|ㄕㄨ ㄌㄟ|ㄙㄨ ㄌㄜˋ|ㄕㄨˋ ㄌㄜˋ|西域古國名（今新疆喀什），讀 ㄕㄨ ㄌㄜˋ。
+姑臧|ㄍㄨ ㄗㄤ|ㄍㄨ ㄗㄤˋ|ㄍㄨ ㄐㄧㄢ|ㄍㄨˇ ㄗㄤ|河西走廊古名城（今甘肅武威），「臧」讀 ㄗㄤ（一聲）。
+朝歌|ㄓㄠ ㄍㄜ|ㄔㄠˊ ㄍㄜ|ㄓㄠˋ ㄍㄜ|ㄔㄠˊ ㄍㄜˊ|商朝末年都城名，「朝」在此讀 ㄓㄠ（一聲）。
 `;
 
         const parseBank = t => t.trim().split('\n').map(l => {
@@ -946,7 +1100,22 @@
                 ['出', '<path d="M24 58C24 76 76 76 76 58M50 18V70M36 44L50 30L64 44"/>', ['山', '入', '土'], '會意字，像腳跨出洞穴或土坑的樣子。'],
                 ['天', '<rect x="38" y="14" width="24" height="18" rx="4"/><path d="M50 32V62M18 46L50 40L82 46M30 88L50 62L70 88"/>', ['大', '夫', '立'], '會意字，突出人頭頂之上至高無上的天空。'],
                 ['土', '<path d="M50 22V80M26 52H74M16 80H84"/><ellipse cx="50" cy="36" rx="10" ry="14"/>', ['王', '士', '山'], '象形字，像地面上堆積起來的土塊。'],
-                ['竹', '<path d="M34 18V82M66 18V82M18 36L34 26L46 36M54 36L66 26L82 36"/>', ['林', '艸', '木'], '象形字，像兩枝葉片下垂的竹子。']
+                ['竹', '<path d="M34 18V82M66 18V82M18 36L34 26L46 36M54 36L66 26L82 36"/>', ['林', '艸', '木'], '象形字，像兩枝葉片下垂的竹子。'],
+                ['川', '<path d="M26 16C20 40 32 62 24 84M50 16C44 40 56 62 48 84M74 16C68 40 80 62 72 84"/>', ['水', '州', '順'], '象形字，像三條並流的河水，是河川的本字。'],
+                ['石', '<path d="M18 22H82M42 22L20 68M38 50H74V82H38Z"/>', ['右', '后', '岩'], '會意字，上面是山崖，下面是山崖下的石塊。'],
+                ['品', '<rect x="36" y="14" width="28" height="22" rx="4"/><rect x="14" y="54" width="28" height="22" rx="4"/><rect x="58" y="54" width="28" height="22" rx="4"/>', ['晶', '眾', '森'], '會意字，三個「口」相疊，本義為眾多、品類。'],
+                ['晶', '<circle cx="50" cy="24" r="13"/><circle cx="28" cy="68" r="13"/><circle cx="72" cy="68" r="13"/><path d="M44 24H56M22 68H34M66 68H78"/>', ['品', '日', '明'], '會意字，三個「日」相疊，形容光輝明亮。'],
+                ['炎', '<path d="M30 46C36 30 44 22 50 12C56 22 64 30 70 46M50 12V38M24 86C32 68 42 58 50 48C58 58 68 68 76 86M50 48V78"/>', ['火', '森', '焚'], '會意字，上下兩「火」相疊，表示火勢熾盛。'],
+                ['夕', '<path d="M58 18C32 28 30 72 58 84C46 66 46 34 58 18Z"/>', ['月', '日', '肉'], '象形字，與「月」同源，像傍晚初現的一彎新月。'],
+                ['夫', '<path d="M50 22V64M20 44L50 38L80 44M32 88L50 64L68 88M26 22H74"/><circle cx="50" cy="14" r="6"/>', ['大', '天', '立'], '會意字，在「大」字頭上加一橫，表示插簪束髮的成年男子。'],
+                ['工', '<path d="M22 22H78M50 22V78M20 78H80"/>', ['土', '王', '士'], '象形字，像木匠用來規矩畫線或夯土的器具。'],
+                ['戈', '<path d="M50 14V88M22 30H82L64 20M34 46L68 64"/>', ['弓', '矢', '刀'], '象形字，像一把有長柄與橫刃的古代兵器。'],
+                ['矢', '<path d="M50 26V78M34 38L50 14L66 38M38 78L50 66L62 78"/>', ['戈', '弓', '大'], '象形字，像一支有箭頭、箭桿與箭羽的箭。'],
+                ['足', '<circle cx="50" cy="24" r="10"/><path d="M50 34V62M36 62H68M36 62L26 84M50 62L50 86M64 62L74 84"/>', ['止', '走', '步'], '象形字，像人的大腿與腳掌，是腳的古字。'],
+                ['行', '<path d="M36 16V44L16 56M36 44L16 84M64 16V44L84 56M64 44L84 84"/>', ['街', '步', '從'], '象形字，像縱橫交錯的十字路口，本義為道路。'],
+                ['正', '<path d="M22 22H78M50 22V78M50 50H72M24 78H78"/>', ['止', '步', '定'], '會意字，上「口」或城池一橫、下「止」（腳），表示向城邑進發、端正。'],
+                ['好', '<path d="M28 20C38 14 42 28 34 38L44 82M18 52L46 58M70 20C78 20 78 34 70 38V82M54 52H84"/>', ['女', '子', '安'], '會意字，左「女」右「子」，表示女子懷抱幼兒、美好之意。'],
+                ['見', '<ellipse cx="50" cy="30" rx="22" ry="12"/><circle cx="50" cy="30" r="5"/><path d="M40 42L26 84M60 42V80C60 86 72 86 80 78"/>', ['目', '貝', '人'], '會意字，上面是「目」，下面是人，表示張目看見。']
             ]),
             seal: G('seal', [
                 ['鼎', '<path d="M28 20V34M72 20V34M24 34H76M28 34C26 56 34 66 50 66C66 66 74 56 72 34M50 66V74M36 70L28 88M64 70L72 88M38 46H62"/>', ['貞', '鼓', '員'], '象形字，像兩耳、圓腹、三足的青銅鼎，是古代煮食與祭祀的重要器物。'],
@@ -998,7 +1167,22 @@
                 ['明', '<rect x="18" y="30" width="26" height="40" rx="10"/><path d="M18 50H44M74 16C52 26 52 74 74 84C64 66 64 34 74 16Z"/><path d="M58 50H68"/>', ['日', '月', '目'], '會意字，左日（或窗）右月，合起來代表光明。'],
                 ['好', '<path d="M28 20C38 14 44 28 34 38C24 50 22 68 28 84M34 38C44 50 46 68 40 84M16 54L46 58M68 18C78 18 78 36 68 38C58 36 58 18 68 18ZM68 38V78C68 84 62 86 58 84M52 52H84"/>', ['女', '子', '安'], '會意字，左「女」右「子」，有女子懷抱幼兒、美好之意。'],
                 ['見', '<rect x="34" y="14" width="32" height="40" rx="10"/><path d="M34 30H66M34 42H66M40 54C36 70 28 80 18 86M60 54V82C60 86 68 86 78 82"/>', ['貝', '目', '人'], '會意字，上面是「目」，下面是「儿」（人），表示人張目看見。'],
-                ['車', '<ellipse cx="26" cy="54" rx="10" ry="20"/><ellipse cx="74" cy="54" rx="10" ry="20"/><path d="M16 54H84M50 14V86M36 22H64M36 78H64"/>', ['輪', '舟', '田'], '象形字，小篆像兩個車輪、車軸與車廂的戰車。']
+                ['車', '<ellipse cx="26" cy="54" rx="10" ry="20"/><ellipse cx="74" cy="54" rx="10" ry="20"/><path d="M16 54H84M50 14V86M36 22H64M36 78H64"/>', ['輪', '舟', '田'], '象形字，小篆像兩個車輪、車軸與車廂的戰車。'],
+                ['魚', '<path d="M50 14C34 26 32 52 50 66C68 52 66 26 50 14ZM34 72L50 66L66 72M34 86L50 78L66 86M40 36H60M42 48H58"/>', ['鳥', '龜', '蟲'], '象形字，小篆像一條豎立的魚，有魚頭、魚身與魚尾。'],
+                ['鳥', '<path d="M36 20C48 12 64 18 62 34C60 44 48 52 44 64M36 20L24 28L36 32M44 64L32 86M44 64L56 86M62 34C74 44 74 64 62 76"/>', ['隹', '魚', '羽'], '象形字，小篆像一隻長尾、有喙與羽翼的鳥。'],
+                ['馬', '<path d="M32 16H64M32 16V56C32 60 64 60 64 56M32 28H64M32 42H64M34 58L22 86M46 58V86M58 58V86M70 58L78 84"/>', ['鹿', '象', '虎'], '象形字，小篆突出馬頭、鬃毛、四條腿與馬尾。'],
+                ['牛', '<path d="M22 14C24 34 36 42 50 42C64 42 76 34 78 14M50 42V88M26 60H74"/>', ['羊', '午', '犬'], '象形字，小篆突出兩隻向上彎曲的牛角。'],
+                ['虎', '<path d="M28 18H72M50 18V34M28 34C24 54 32 72 50 74C68 72 76 54 72 34M34 46H66M36 74L24 88M64 74L76 88"/>', ['貓', '豹', '犬'], '象形字，小篆像張牙舞爪、身上帶有虎紋的老虎。'],
+                ['鹿', '<path d="M34 12L44 26M66 12L56 26M30 30H70V54H30ZM40 54V86M60 54V86M30 68H70"/>', ['馬', '象', '虎'], '象形字，小篆突出頭上分岔的鹿角與修長身軀。'],
+                ['象', '<path d="M28 24C24 14 40 12 46 22C60 18 76 26 76 44L72 64M28 24C20 40 22 60 28 84M40 62V86M58 62V86M72 64L82 82"/>', ['豕', '鹿', '馬'], '象形字，小篆突出長鼻子、大耳朵與粗壯四肢。'],
+                ['龜', '<path d="M44 14H56V26H44ZM30 26H70V74H30ZM50 26V74M30 44H70M30 58H70M22 32L30 40M78 32L70 40M22 68L30 62M78 68L70 62"/>', ['魚', '蛇', '蟲'], '象形字，小篆像一隻有龜殼紋路與四足的烏龜。'],
+                ['犬', '<path d="M30 34L44 22L56 32L50 46C64 40 76 44 80 56M48 46V86M68 50V86M36 52H72"/>', ['豕', '大', '太'], '象形字，小篆像身體瘦長、尾巴上翹的狗。'],
+                ['豕', '<path d="M24 22H76M50 22V44M28 44C44 40 62 42 70 54C74 70 62 84 44 82M38 56L24 76M52 62L36 86M68 54L80 72"/>', ['犬', '象', '羊'], '象形字，小篆像垂著大肚子、有四足與短尾的豬。'],
+                ['酉', '<path d="M30 16H70M50 16V28M26 28H74V80H26ZM38 28V54M62 28V54M26 66H74"/>', ['酒', '西', '由'], '象形字，小篆像一個盛酒的酒罈，是「酒」的本字。'],
+                ['夕', '<path d="M62 16C34 26 30 72 62 84C48 68 48 34 62 16Z"/>', ['月', '日', '肉'], '象形字，小篆像傍晚天邊出現的一彎新月。'],
+                ['夫', '<path d="M24 26H76M50 12V60M20 42C36 48 64 48 80 42M24 86C36 72 44 64 50 60C56 64 64 72 76 86"/>', ['大', '天', '立'], '會意字，小篆在「大」字上方加一橫，象徵成年男子的髮簪。'],
+                ['戈', '<path d="M50 14V86M18 32H84M64 20L82 32M30 48L72 66"/>', ['弓', '矢', '刀'], '象形字，小篆像一把長柄橫刃的古代兵器。'],
+                ['矢', '<path d="M50 24V76M32 36L50 12L68 36M26 52H74M34 86L50 70L66 86"/>', ['戈', '弓', '大'], '象形字，小篆像一支有箭頭、箭桿與箭羽的箭。']
             ])
         };
 
@@ -1567,6 +1751,11 @@
             saveProgress();
             startTimer(q);
 
+            const scrollBox = document.querySelector('.exam-scroll');
+            if (scrollBox) { scrollBox.classList.remove('scroll-unfurl'); void scrollBox.offsetWidth; scrollBox.classList.add('scroll-unfurl'); }
+            const av = document.getElementById('examiner-avatar');
+            if (av) av.classList.remove('avatar-happy', 'avatar-oops');
+
             const lv = LEVELS[currentLevel] || LEVELS.read;
             document.getElementById('examiner-quote').innerText = lv.idle;
             document.getElementById('note-box').classList.add('hidden');
@@ -1677,6 +1866,7 @@
             const cq = questions[currentQuestionIndex], isCorrect = selectedOption === correctOption;
             const lv = LEVELS[currentLevel] || LEVELS.read;
 
+            const av = document.getElementById('examiner-avatar');
             if (isCorrect) {
                 btnElement?.classList.add('opt-correct');
                 correctCount++; streak++;
@@ -1684,8 +1874,9 @@
                 score += gained;
                 streak >= 3 ? sfx.combo(streak) : sfx.correct();
                 resultHistory.push('🟩'); removeWrongFromLocal(cq);
-                showFeedback('⭕', 'text-emerald-600');
+                showFeedback(true, streak);
                 showScoreFloat(gained, streak);
+                if (av) { av.classList.remove('avatar-oops', 'avatar-happy'); void av.offsetWidth; av.classList.add('avatar-happy'); av.classList.toggle('avatar-fire', streak >= 3); }
                 document.getElementById('examiner-quote').innerText = streak >= 3 && lv.combo ? pickQuote(lv.combo) : pickQuote(lv.ok);
             } else {
                 btnElement?.classList.add('opt-wrong');
@@ -1693,7 +1884,8 @@
                 sfx.wrong(); if (navigator.vibrate) navigator.vibrate(200);
                 [...document.getElementById('options-container').children].forEach(b => { if (b.dataset.opt === correctOption) b.classList.add('opt-correct'); });
                 resultHistory.push('🟥');
-                showFeedback('❌', 'text-red-600');
+                showFeedback(false, 0);
+                if (av) { av.classList.remove('avatar-happy', 'avatar-oops', 'avatar-fire'); void av.offsetWidth; av.classList.add('avatar-oops'); }
                 document.getElementById('examiner-quote').innerText = pickQuote(lv.bad);
                 document.getElementById('game-container').classList.add('shake-animation');
                 setTimeout(() => document.getElementById('game-container').classList.remove('shake-animation'), 400);
@@ -1727,12 +1919,22 @@
             }
         }
 
-        function showFeedback(symbol, colorClass) {
-            const icon = document.getElementById('feedback-icon');
-            icon.innerText = symbol;
-            icon.className = `absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl font-bold z-30 pointer-events-none ${colorClass} transition-opacity duration-200`;
-            icon.style.opacity = '1'; icon.style.animation = 'none'; void icon.offsetWidth; icon.style.animation = 'pop .35s ease-out';
-            setTimeout(() => { icon.style.opacity = '0'; }, 600);
+        function showFeedback(isCorrect, streakCount) {
+            const box = document.getElementById('feedback-icon');
+            const label = !isCorrect ? '誤' : (streakCount >= 3 ? '連捷' : '准');
+            const bg = !isCorrect
+                ? 'bg-[#7f1d1d]/95 border-[#fca5a5] text-[#fecaca]'
+                : (streakCount >= 3 ? 'bg-gradient-to-br from-[#fef08a] to-[#d97706] border-[#fffbeb] text-[#7c1919]' : 'bg-[#991b1b]/95 border-[#fde047] text-[#fef08a]');
+            let sparks = '';
+            if (isCorrect) {
+                const count = streakCount >= 3 ? 10 : 6;
+                for (let i = 0; i < count; i++) {
+                    const ang = (Math.PI * 2 * i) / count;
+                    const dist = streakCount >= 3 ? 68 : 52;
+                    sparks += `<span class="spark-dot" style="--tx:${Math.round(Math.cos(ang)*dist)}px;--ty:${Math.round(Math.sin(ang)*dist)}px;background:${i%2?'#fde047':'#34d399'}"></span>`;
+                }
+            }
+            box.innerHTML = `<div class="relative flex items-center justify-center">${sparks}<div class="stamp-fx ${bg} border-4 rounded-2xl px-5 py-2 shadow-2xl font-black tracking-[0.18em] text-4xl select-none whitespace-nowrap">${label}</div></div>`;
         }
 
         function updateUI() {
@@ -1798,6 +2000,7 @@
             const goScreen = document.getElementById('game-over-screen');
             goScreen.classList.toggle('emperor-pass-mode', isEmperorPass);
             document.getElementById('emperor-crest').classList.toggle('hidden', !isEmperorPass);
+            if (pass) startCelebrationFx(isEmperorPass); else stopCelebrationFx();
 
             const lvIdx = (LEVELS[currentLevel] || {}).idx || 0;
             const prevUnlocked = getUnlockedStage();
@@ -1906,8 +2109,69 @@
             });
         }
 
+        let fxRaf = null;
+        function stopCelebrationFx() {
+            if (fxRaf) { cancelAnimationFrame(fxRaf); fxRaf = null; }
+            const cv = document.getElementById('emperor-fx-canvas');
+            if (cv) { const ctx = cv.getContext('2d'); ctx && ctx.clearRect(0, 0, cv.width, cv.height); }
+        }
+        function startCelebrationFx(continuous) {
+            stopCelebrationFx();
+            const cv = document.getElementById('emperor-fx-canvas');
+            if (!cv) return;
+            const rect = cv.parentElement.getBoundingClientRect();
+            cv.width = Math.max(320, rect.width || 400);
+            cv.height = Math.max(480, rect.height || 700);
+            const ctx = cv.getContext('2d');
+            const colors = ['#fde047', '#f59e0b', '#fef08a', '#fb7185', '#34d399'];
+            const parts = Array.from({ length: continuous ? 42 : 28 }, (_, i) => ({
+                x: Math.random() * cv.width,
+                y: continuous ? Math.random() * cv.height : -Math.random() * 120,
+                vx: (Math.random() - 0.5) * 1.4,
+                vy: 1.4 + Math.random() * 2.2,
+                r: 3 + Math.random() * 4.5,
+                rot: Math.random() * Math.PI * 2,
+                vr: (Math.random() - 0.5) * 0.12,
+                c: colors[i % colors.length],
+                life: 1
+            }));
+            const startAt = performance.now();
+            function tick(now) {
+                ctx.clearRect(0, 0, cv.width, cv.height);
+                const elapsed = now - startAt;
+                let alive = 0;
+                for (const p of parts) {
+                    p.x += p.vx + Math.sin(now * 0.003 + p.rot) * 0.4;
+                    p.y += p.vy;
+                    p.rot += p.vr;
+                    if (p.y > cv.height + 16) {
+                        if (continuous) { p.y = -12; p.x = Math.random() * cv.width; }
+                        else { p.life = 0; }
+                    }
+                    if (!continuous && elapsed > 2600) p.life = Math.max(0, 1 - (elapsed - 2600) / 900);
+                    if (p.life > 0) {
+                        alive++;
+                        ctx.save();
+                        ctx.globalAlpha = p.life * 0.88;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rot);
+                        ctx.fillStyle = p.c;
+                        ctx.fillRect(-p.r, -p.r * 0.55, p.r * 2, p.r * 1.1);
+                        ctx.restore();
+                    }
+                }
+                if (alive > 0 && !document.getElementById('game-over-screen').classList.contains('hidden')) {
+                    fxRaf = requestAnimationFrame(tick);
+                } else {
+                    stopCelebrationFx();
+                }
+            }
+            fxRaf = requestAnimationFrame(tick);
+        }
+
         function confirmBackToMenu() { clearTimer(); saveProgress(); backToMenu(); }
         function backToMenu() {
+            stopCelebrationFx();
             switchBgmScene('cover');
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('game-over-screen').classList.add('hidden');
@@ -1915,7 +2179,7 @@
             document.getElementById('start-screen').classList.remove('hidden');
             refreshBest();
         }
-        function restartGame() { clearSavedProgress(); document.getElementById('game-over-screen').classList.add('hidden'); startGame(currentLevel); }
+        function restartGame() { stopCelebrationFx(); clearSavedProgress(); document.getElementById('game-over-screen').classList.add('hidden'); startGame(currentLevel); }
 
         function watchAdToRevive() {
             lives = maxLives;
